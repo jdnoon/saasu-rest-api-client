@@ -1,0 +1,33 @@
+{
+    "name": "terah/saasu-rest-api-client",
+    "description": "A client for interacting with the Saasu JSON web service",
+    "keywords": [
+        "terah",
+        "saasu",
+        "rest",
+        "json"
+    ],
+    "homepage": "https://github.com/terah/saasu-rest-api-client",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Terry Cullen",
+            "email": "terry@terah.com.au",
+            "homepage": "http://terah.com.au",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terah\\Saasu\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
