@@ -72,7 +72,6 @@ class Entity  implements \JsonSerializable
     }
 
     /**
-     * @param null|int  $id
      * @param array|null $filter
      *
      * @return object

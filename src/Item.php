@@ -8,7 +8,7 @@ namespace Terah\Saasu;
  *
  * @package Terah\Saasu
  * @property string Notes
- * @property array BuildItems
+ * @property BuildItem[] BuildItems
  * @property integer Id
  * @property string Code
  * @property string Description
@@ -43,6 +43,8 @@ namespace Terah\Saasu;
  * @property boolean IsVoucher
  * @property string ValidFrom
  * @property string ValidTo
+ * @property double OnOrder
+ * @property double Committed
  * @property array _links
  */
 class Item extends Entity
@@ -52,57 +54,55 @@ class Item extends Entity
         'plural'   => 'Items'
     ];
 
-    protected $fields = [
-        'Notes'                    => '',
-        'BuildItems'               => [
-//            [
-//                'Id'          => null,
-//                'Code'        => '',
-//                'Description' => '',
-//                'Quantity'    => null,
-//                '_links'      => [
-//                ],
-//            ],
-        ],
-        'Id'                       => null,
-        'Code'                     => '',
-        'Description'              => '',
-        'Type'                     => '',
-        'IsActive'                 => true,
-        'IsInventoried'            => false,
-        'AssetAccountId'           => null,
-        'IsSold'                   => true,
-        'SaleIncomeAccountId'      => null,
-        'SaleTaxCodeId'            => null,
-        'SaleCoSAccountId'         => null,
-        'IsBought'                 => true,
-        'PurchaseExpenseAccountId' => null,
-        'PurchaseTaxCodeId'        => null,
-        'MinimumStockLevel'        => null,
-        'StockOnHand'              => null,
-        'CurrentValue'             => null,
-        'PrimarySupplierContactId' => null,
-        'PrimarySupplierItemCode'  => '',
-        'DefaultReOrderQuantity'   => null,
-        'LastUpdatedId'            => '',
-        'IsVisible'                => true,
-        'IsVirtual'                => false,
-        'VType'                    => '',
-        'SellingPrice'             => null,
-        'IsSellingPriceIncTax'     => true,
-        'CreatedDateUtc'           => '',
-        'LastModifiedDateUtc'      => '',
-        'LastModifiedBy'           => null,
-        'BuyingPrice'              => null,
-        'IsBuyingPriceIncTax'      => true,
-        'IsVoucher'                => false,
-        'ValidFrom'                => '',
-        'ValidTo'                  => '',
-        '_links'                   => [],
+    protected $fields           = [
+        'Notes'                     => '',
+        'BuildItems'                => [],
+        'Id'                        => null,
+        'Code'                      => '',
+        'Description'               => '',
+        'Type'                      => '',
+        'IsActive'                  => true,
+        'IsInventoried'             => false,
+        'AssetAccountId'            => null,
+        'IsSold'                    => true,
+        'SaleIncomeAccountId'       => null,
+        'SaleTaxCodeId'             => null,
+        'SaleCoSAccountId'          => null,
+        'IsBought'                  => true,
+        'PurchaseExpenseAccountId'  => null,
+        'PurchaseTaxCodeId'         => null,
+        'MinimumStockLevel'         => null,
+        'StockOnHand'               => null,
+        'CurrentValue'              => null,
+        'PrimarySupplierContactId'  => null,
+        'PrimarySupplierItemCode'   => '',
+        'DefaultReOrderQuantity'    => null,
+        'LastUpdatedId'             => '',
+        'IsVisible'                 => true,
+        'IsVirtual'                 => false,
+        'VType'                     => '',
+        'SellingPrice'              => null,
+        'IsSellingPriceIncTax'      => true,
+        'CreatedDateUtc'            => '',
+        'LastModifiedDateUtc'       => '',
+        'LastModifiedBy'            => null,
+        'BuyingPrice'               => null,
+        'IsBuyingPriceIncTax'       => true,
+        'IsVoucher'                 => false,
+        'ValidFrom'                 => '',
+        'ValidTo'                   => '',
+        'OnOrder'                   => null,
+        'Committed'                 => null,
+        '_links'                    => [],
     ];
+}
 
-    public function save()
-    {
-        throw new \Exception("Save is not available on items at this time. See: https://api.saasu.com/");
-    }
+class BuildItem
+{
+    public $Id              = null;
+    public $Code            = '';
+    public $Description     = '';
+    public $Quantity        = null;
+    public $_links          = [];
+
 }

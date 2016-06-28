@@ -27,8 +27,8 @@ namespace Terah\Saasu;
  * @property null    EmailAddress
  * @property string  ContactId
  * @property null    ContactManagerId
- * @property array   DirectDepositDetails
- * @property array   ChequeDetails
+ * @property DirectDepositDetails   DirectDepositDetails
+ * @property ChequeDetails   ChequeDetails
  * @property string  CustomField1
  * @property string  CustomField2
  * @property string  TwitterId
@@ -43,11 +43,11 @@ namespace Terah\Saasu;
  * @property null    DefaultSaleDiscount
  * @property null    DefaultPurchaseDiscount
  * @property integer LastModifiedByUserId
- * @property array   BpayDetails
- * @property array   PostalAddress
- * @property array   OtherAddress
- * @property array   SaleTradingTerms
- * @property array   PurchaseTradingTerms
+ * @property BpayDetails   BpayDetails
+ * @property PostalAddress   PostalAddress
+ * @property OtherAddress   OtherAddress
+ * @property SaleTradingTerms   SaleTradingTerms
+ * @property PurchaseTradingTerms   PurchaseTradingTerms
  * @property array   _links
  */
 class Contact extends Entity
@@ -78,16 +78,8 @@ class Contact extends Entity
         'EmailAddress'              => null,
         'ContactId'                 => '',
         'ContactManagerId'          => null,
-        'DirectDepositDetails'      => [
-            'AcceptDirectDeposit'       => true,
-            'AccountName'               => '',
-            'AccountBSB'                => '',
-            'AccountNumber'             => '',
-        ],
-        'ChequeDetails'             => [
-            'AcceptCheque'              => false,
-            'ChequePayableTo'           => null,
-        ],
+        'DirectDepositDetails'      => null,
+        'ChequeDetails'             => null,
         'CustomField1'              => '',
         'CustomField2'              => '',
         'TwitterId'                 => '',
@@ -102,49 +94,58 @@ class Contact extends Entity
         'DefaultSaleDiscount'       => null,
         'DefaultPurchaseDiscount'   => null,
         'LastModifiedByUserId'      => null,
-        'BpayDetails'               => [
-            'BillerCode'                => '',
-            'CRN'                       => '',
-        ],
-        'PostalAddress'             => [
-            'Street'                    => '',
-            'City'                      => '',
-            'State'                     => '',
-            'Postcode'                  => '',
-            'Country'                   => '',
-        ],
-        'OtherAddress'              => [
-            'Street'                    => '',
-            'City'                      => '',
-            'State'                     => '',
-            'Postcode'                  => '',
-            'Country'                   => '',
-        ],
-        'SaleTradingTerms'          => [
-            'TradingTermsType'          => null,
-            'TradingTermsInterval'      => null,
-            'TradingTermsIntervalType'  => null,
-        ],
-        'PurchaseTradingTerms'      => [
-            'TradingTermsType'         => null,
-            'TradingTermsInterval'     => null,
-            'TradingTermsIntervalType' => null,
-        ],
+        'BpayDetails'               => null,
+        'PostalAddress'             => null,
+        'OtherAddress'              => null,
+        'SaleTradingTerms'          => null,
+        'PurchaseTradingTerms'      => null,
         '_links'                    => [],
     ];
+}
 
-    public function __construct(Client $saasu)
-    {
+class ChequeDetails
+{
+    public $AcceptCheque            = false;
+    public $ChequePayableTo         = null;
+}
 
-    }
+class BpayDetails
+{
+    public $BillerCode              = '';
+    public $CRN                     = '';
 }
 
 class DirectDepositDetails
 {
-    protected $fields = [
-        'AcceptDirectDeposit'       => true,
-        'AccountName'               => '',
-        'AccountBSB'                => '',
-        'AccountNumber'             => '',
-    ];
+    public $AcceptDirectDeposit     = true;
+    public $AccountName             = '';
+    public $AccountBSB              = '';
+    public $AccountNumber           = '';
 }
+
+class SaleTradingTerms
+{
+    public $TradingTermsType        = null;
+    public $TradingTermsInterval    = null;
+    public $TradingTermsIntervalType= null;
+}
+
+class PurchaseTradingTerms extends SaleTradingTerms
+{
+}
+
+
+class PostalAddress
+{
+    public $Street                  = '';
+    public $City                    = '';
+    public $State                   = '';
+    public $Postcode                = '';
+    public $Country                 = '';
+}
+
+
+class OtherAddress extends PostalAddress
+{
+}
+
