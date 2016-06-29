@@ -12,61 +12,49 @@
 
 namespace Terah\Saasu;
 
-use Terah\Assert\Assert;
+use function Terah\Assert\Assert;
+use Terah\Saasu\Values\Value;
 
-class Entity  implements \JsonSerializable
+/**
+ * Class Entity
+ *
+ * @package Terah\Saasu
+ */
+abstract class Entity
 {
+    /** @var RestClient */
     protected $saasu        = null;
-    protected $fields       = [];
     protected $entities     = [];
-    protected $dirty        = [];
 
-    public function __construct(Client $saasu)
+    public function __construct(RestClient $saasu)
     {
         $this->saasu = $saasu;
         (new Assert($this->entities))->keysExist(['singular', 'plural'])->all()->notEmpty("The keys have not been specified for the url segments.");
     }
 
-    /**
-     * @param int $id
-     * @return Entity
-     */
-    public function load($id)
+    public function create(Value $value)
     {
-        (new Assert($id))->integer("ID must be null or integer");
-        $data = $this->saasu->method(Client::FETCH)->itemId($id)->sendRequest($this->getSingular());
-        return $this->hydrate($data)->reset();
+        unset($value->id);
+        return $this->save($value);
     }
 
-    /**
-     * @param array $data
-     * @return $this
-     */
-    public function hydrate(array $data)
+    public function update(Value $value)
     {
-        foreach ( $data as $field => $value )
-        {
-            $this->set($field, $value);
-        }
-        return $this;
+        Assert($value->id)->id();
+        return $this->save($value);
     }
 
-    /**
-     * @param array $data
-     * @return Entity
-     */
-    public function spawn(array $data)
+    public function delete($id)
     {
-        $spawn = clone $this;
-        return $spawn->reset()->hydrate($data);
+        return $this->saasu->method(Client::DELETE)->sendRequest($this->getPlural());
     }
+
 
     /**
      * @return $this
      */
     public function reset()
     {
-        $this->dirty = [];
         $this->saasu->reset();
         return $this;
     }
@@ -78,11 +66,11 @@ class Entity  implements \JsonSerializable
      */
     public function fetch(array $filter=[])
     {
-        $data = $this->saasu->method(Client::FETCH)->data($filter)->sendRequest($this->getPlural());
-        $data = isset($data[$this->entities['plural']]) ? $data[$this->entities['plural']] : [];
+        $data   = $this->saasu->method(Client::FETCH)->data($filter)->sendRequest($this->getPlural());
+        $data   = isset($data[$this->entities['plural']]) ? $data[$this->entities['plural']] : [];
         foreach ( $data as $idx => $item )
         {
-            $data[$idx] = $this->spawn($item);
+            $data[$idx] = $this->getValueObject($item);
         }
         return $data;
     }
@@ -94,9 +82,9 @@ class Entity  implements \JsonSerializable
      */
     public function fetchOne($id)
     {
-        (new Assert($id))->integer("ID must be null or integer");
+        Assert($id)->integer("ID must be an integer");
         $data = $this->saasu->method(Client::FETCH)->itemId($id)->sendRequest($this->getSingular());
-        return $this->spawn($data);
+        return $this->getValueObject($data);
     }
 
     /**
@@ -108,7 +96,7 @@ class Entity  implements \JsonSerializable
      */
     public function fetchList($keyedOn, $valueField, array $filter=[])
     {
-        (new Assert($this->fields))->keysExist([$keyedOn, $valueField]);
+        //(new Assert($this->fields))->keysExist([$keyedOn, $valueField]);
         $result = $this->saasu->method(Client::FETCH)->data($filter)->sendRequest($this->getPlural());
         $result = isset($result[$this->entities['plural']]) ? $result[$this->entities['plural']] : [];
         $data   = [];
@@ -119,22 +107,16 @@ class Entity  implements \JsonSerializable
         return $data;
     }
 
-    public function isUnchanged()
-    {
-        return empty($this->dirty);
-    }
-
     /**
      * @return object
      */
-    public function save()
+    public function save(Value $value)
     {
-        $data   = $this->get();
-        if ( is_null($data['id']) )
+        if ( is_null($value->id) )
         {
-            $data = $this->saasu->method(Client::INSERT)->data($data)->sendRequest($this->getPlural());
+            $data = $this->saasu->method(Client::INSERT)->data($value)->sendRequest($this->getPlural());
         }
-        $data = $this->saasu->method(Client::UPDATE)->itemId($data['id'])->data($data)->sendRequest($this->getSingular());
+        $data = $this->saasu->method(Client::UPDATE)->data($value)->sendRequest($this->getSingular());
     }
 
     /**
@@ -152,53 +134,11 @@ class Entity  implements \JsonSerializable
     {
         return strtolower($this->entities['plural']);
     }
+
     /**
-     * @param string|array $name
-     * @param mixed $value
-     *
-     * @return $this
+     * @param $data
+     * @return Value
      */
-    public function set($name, $value=null)
-    {
-        if ( is_array($name) )
-        {
-            foreach ( $name as $key => $value )
-            {
-                $this->set($key, $value);
-            }
-        }
-        (new Assert($this->fields))->keyExists($name);
-        if ( $this->fields[$name] !== $value )
-        {
-            $this->dirty[$name] = [$this->fields[$name], $value];
-            $this->fields[$name] = $value;
-        }
-        return $this;
-    }
-
-    public function __set($name, $value)
-    {
-        return $this->set($name, $value);
-    }
-
-    public function get($name=null)
-    {
-        if ( is_null($name) )
-        {
-            return $this->fields;
-        }
-        (new Assert($this->fields))->keyExists($name);
-        return  $this->fields[$name];
-    }
-
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
-    public function jsonSerialize()
-    {
-        return json_encode($this->fields);
-    }
+    abstract protected function getValueObject(\stdClass $data);
 
 }

@@ -2,8 +2,16 @@
 
 namespace Terah\Saasu\Test;
 
+use Terah\Saasu\RestClient;
+use Terah\Saasu\Account;
+use Terah\Saasu\Attachment;
+use Terah\Saasu\Company;
 use Terah\Saasu\Contact;
-use Terah\Saasu\Request;
+use Terah\Saasu\FileIdentity;
+use Terah\Saasu\Invoice;
+use Terah\Saasu\Item;
+use Terah\Saasu\Payment;
+use Terah\Saasu\TaxCode;
 
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,69 +19,114 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->saasu = new Request(0, '');
+        $this->saasu = new RestClient('https://api.saasu.com/', getenv('SAASU_TOKEN'), getenv('SAASU_FILE_ID'));
     }
 
-//    public function testContact()
-//    {
-//        $data = array(
-//
-//        );
-//        $contact  = new Contact($this->saasu);
-//        $response = $contact->save(null, $data);
-//        $response = $contact->getContact($response->something);
-//        $response = $contact->updateContact($id, $data);
-//        $response = $contact->getContacts($filters);
-//        $response = $contact->deleteContact($id);
-//        $response = $contact->getContact($id);
-//    }
+    public function testAccount()
+    {
+        $data       = [];
+        $saasu      = new Account($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
 
-//    public function testInvoiceAttachment()
-//    {
-//        $data = array(
-//
-//        );
-//        $response = $this->saasu->addInvoiceAttachment($data);
-//        $response = $this->saasu->getInvoiceAttachment($id);
-//        $response = $this->saasu->updateInvoiceAttachment($id, $data);
-//        $response = $this->saasu->getInvoiceAttachments($filters);
-//        $response = $this->saasu->deleteInvoiceAttachment($id);
-//        $response = $this->saasu->getInvoiceAttachment($id);
-//    }
-//
-//    public function testAccount()
-//    {
-//        $data = array(
-//
-//        );
-//        $response = $this->saasu->addAccount($data);
-//        $response = $this->saasu->getAccount($id);
-//        $response = $this->saasu->updateAccount($id, $data);
-//        $response = $this->saasu->getAccounts($filters);
-//        $response = $this->saasu->deleteAccount($id);
-//        $response = $this->saasu->getAccount($id);
-//    }
+    public function testAttachment()
+    {
+        $data       = [];
+        $saasu      = new Attachment($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
+
+    public function testCompany()
+    {
+        $data       = [];
+        $saasu      = new Company($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
+
+    public function testContact()
+    {
+        $data       = [];
+        $saasu      = new Contact($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
+
+    public function testFileIdentity()
+    {
+        $data       = [];
+        $saasu      = new FileIdentity($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
 
     public function testInvoice()
     {
-        $data = array(
+        $data       = [];
+        $saasu      = new Invoice($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
 
-        );
-        $response = $this->saasu->addInvoice($data);
-        $response = $this->saasu->getInvoice($id);
-        $response = $this->saasu->updateInvoice($id, $data);
-        $response = $this->saasu->getInvoices($filters);
-        $response = $this->saasu->deleteInvoice($id);
-        $response = $this->saasu->getInvoice($id);
+    public function testItem()
+    {
+        $data       = [];
+        $saasu      = new Item($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
     }
 
     public function testPayment()
     {
-        $response = $this->saasu->addPayment($data);
-        $response = $this->saasu->getPayment($id);
-        $response = $this->saasu->updatePayment($id, $data);
-        $response = $this->saasu->getPayments($filters);
-        $response = $this->saasu->deletePayment($id);
-        $response = $this->saasu->getPayment($id);
+        $data       = [];
+        $saasu      = new Payment($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
+    }
+
+    public function testTaxCode()
+    {
+        $data       = [];
+        $saasu      = new TaxCode($this->saasu);
+        $response   = $saasu->create(null, $data);
+        $response   = $saasu->fetchOne($response->something);
+        $response   = $saasu->update($id, $data);
+        $response   = $saasu->get($filters);
+        $response   = $saasu->delete($id);
+        $response   = $saasu->get($id);
     }
 }

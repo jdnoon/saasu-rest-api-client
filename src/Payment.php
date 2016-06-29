@@ -26,7 +26,7 @@ namespace Terah\Saasu;
  * @property bool RequiresFollowUp
  * @property array _links
  */
-class FileIdentity extends Entity
+class Payment extends Entity
 {
     protected $entities         = [
         'singular'                  => 'Company',
