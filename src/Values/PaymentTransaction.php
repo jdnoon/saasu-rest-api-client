@@ -8,7 +8,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class PaymentTransaction extends Value
+class PaymentTransaction extends RestableValue
 {
 
     /**

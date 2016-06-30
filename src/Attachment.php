@@ -1,6 +1,9 @@
 <?php
 
 namespace Terah\Saasu;
+use Terah\Saasu\Values\FileAttachmentInfo;
+use function Terah\Assert\Assert;
+use Terah\Saasu\Values\RestableValue;
 
 /**
  * Class Attachment
@@ -15,16 +18,32 @@ namespace Terah\Saasu;
 class Attachment extends Entity
 {
     protected $entities         = [
-        'singular'                  => 'Attachment',
-        'plural'                    => 'Attachments'
+        'singular'                  => 'InvoiceAttachment',
+        'plural'                    => 'InvoiceAttachments'
     ];
 
-    protected $fields           = [
-        'AttachmentData'            =>  null,
-        'AllowExistingAttachmentToBeOverwritten' =>  false,
-        'Name'                      =>  '',
-        'Description'               =>  '',
-        'ItemIdAttachedTo'          =>  null,
-        '_links'                    =>  [],
-    ];
+    protected $filters          = [];
+
+    /**
+     * @param \stdClass $data
+     * @return FileAttachmentInfo
+     */
+    protected function getValueObject(\stdClass $data)
+    {
+        return new FileAttachmentInfo($data);
+    }
+
+    /**
+     * @param array $filters
+     *
+     * @return RestableValue[]
+     */
+    public function fetch(array $filters=[])
+    {
+        Assert($filters)->keyExists('InvoiceId');
+        Assert($filters['InvoiceId'])->id();
+        $this->entities['plural'] = "Attachments/{$filters['InvoiceId']}";
+        unset($filters['InvoiceId']);
+        return parent::fetch($filters);
+    }
 }

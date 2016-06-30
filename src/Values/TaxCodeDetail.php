@@ -8,7 +8,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class TaxCodeDetail extends Value
+class TaxCodeDetail extends RestableValue
 {
     /**
      * Custom notes associated with this tax code (if any).

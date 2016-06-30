@@ -6,7 +6,7 @@ namespace Terah\Saasu\Values;
  * Class CompanyDetail
  * @package Terah\Saasu\Values
  */
-class CompanyDetail extends Value
+class CompanyDetail extends RestableValue
 {
     /**
      * The unique key/Id of the company.
@@ -18,61 +18,61 @@ class CompanyDetail extends Value
      * Name of the company.
      * @var string
      */
-    public $Name                    = '';
+    public $Name                    = null;
 
     /**
      * Company ABN.
      * @var string
      */
-    public $Abn                     = '';
+    public $Abn                     = null;
 
     /**
      * Url of the company website.
      * @var string
      */
-    public $Website                 = '';
+    public $Website                 = null;
 
     /**
      * Identifier used for concurrency checking. Required for update.
      * @var string
      */
-    public $LastUpdatedId           = '';
+    public $LastUpdatedId           = null;
 
     /**
      * Description of the company.
      * @var string
      */
-    public $LongDescription         = '';
+    public $LongDescription         = null;
 
     /**
      * Url of the company logo. Note: This field is not supported and will be removed in a future version.
      * @var string
      */
-    public $LogoUrl                 = '';
+    public $LogoUrl                 = null;
 
     /**
      * Company trading name.
      * @var string
      */
-    public $TradingName             = '';
+    public $TradingName             = null;
     
     /**
      * Company email address.
      * @var string
      */
-    public $CompanyEmail            = '';
+    public $CompanyEmail            = null;
 
     /**
      * Date and time that the company data was last modified in UTC.
      * @var DateTime
      */
-    public $LastModifiedDateUtc     = '';
+    public $LastModifiedDateUtc     = null;
 
     /**
      * Date and time that the company was created in UTC.
      * @var DateTime
      */
-    public $CreatedDateUtc          = '';
+    public $CreatedDateUtc          = null;
 
     /**
      * The user id that last modified the company data.
@@ -92,13 +92,16 @@ class CompanyDetail extends Value
     public $_links                  = [];
 
     /**
-     * CompanyDetail constructor.
-     *
      * @param \stdClass $data
+     * @return $this
      */
-    public function __construct(\stdClass $data)
+    public function set(\stdClass $data)
     {
-        parent::__construct($data);
+        parent::set($data);
+        if ( isset($data->InsertedCompanyId) )
+        {
+            $this->setId($data->InsertedCompanyId);
+        }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
@@ -107,6 +110,7 @@ class CompanyDetail extends Value
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
+        return $this;
     }
 
 }

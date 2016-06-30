@@ -8,7 +8,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class FileAttachmentInfo extends Value
+class FileAttachmentInfo extends RestableValue
 {
     /**
      * The Id of the attachment.

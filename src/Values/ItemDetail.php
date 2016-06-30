@@ -7,7 +7,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class ItemDetail extends Value
+class ItemDetail extends RestableValue
 {
     /**
      * Custom notes associated with this item.

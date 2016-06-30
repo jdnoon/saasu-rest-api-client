@@ -6,7 +6,7 @@ namespace Terah\Saasu\Values;
  * Class AccountDetail
  * @package Terah\Saasu\Values
  */
-class AccountDetail extends Value
+class AccountDetail extends RestableValue
 {
     /**
      * The unique Id for the account.
@@ -163,13 +163,16 @@ class AccountDetail extends Value
     public $_links                      = [];
 
     /**
-     * AccountDetail constructor.
-     *
      * @param \stdClass $data
+     * @return $this
      */
-    public function __construct(\stdClass $data)
+    public function set(\stdClass $data)
     {
-        parent::__construct($data);
+        parent::set($data);
+        if ( isset($data->InsertedEntityId) )
+        {
+            $this->setId($data->InsertedEntityId);
+        }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
@@ -178,5 +181,6 @@ class AccountDetail extends Value
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
+        return $this;
     }
 }

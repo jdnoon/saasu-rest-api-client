@@ -6,7 +6,7 @@ namespace Terah\Saasu\Values;
  * Class FileAttachment
  * @package Terah\Saasu\Values
  */
-class FileAttachment extends Value
+class FileAttachment extends RestableValue
 {
     /**
      * 	This is an array of bytes and represents the data of the attachment (ie. the attachment itself).

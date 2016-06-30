@@ -11,13 +11,22 @@ use function Terah\Assert\Assert;
  */
 abstract class Value
 {
-    protected $reflectionClass = null;
+    //protected $reflectionClass = null;
     /**
      * Value constructor.
      *
      * @param \stdClass $data
      */
     public function __construct(\stdClass $data)
+    {
+        $this->set($data);
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return $this
+     */
+    public function set(\stdClass $data)
     {
         foreach ( $data as $field => $value )
         {
@@ -31,6 +40,7 @@ abstract class Value
         {
             $this->_links = $data->_links;
         }
+        return $this;
     }
 //
 //    /**

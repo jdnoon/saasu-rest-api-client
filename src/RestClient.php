@@ -23,7 +23,8 @@ class RestClient extends \Terah\RestClient\RestClient
     }
 
     /**
-     * @param string $entity
+     * @param $entity
+     * @return string
      */
     protected function getUrl($entity)
     {
@@ -38,6 +39,7 @@ class RestClient extends \Terah\RestClient\RestClient
             $query          = array_merge($query, $this->data);
         }
         $this->curlUrl = rtrim($this->curlUrl, '?') . '?' . http_build_query($query);
+        return $this->curlUrl;
     }
 
     /**

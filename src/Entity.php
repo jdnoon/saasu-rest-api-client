@@ -13,6 +13,7 @@
 namespace Terah\Saasu;
 
 use function Terah\Assert\Assert;
+use Terah\Saasu\Values\RestableValue;
 use Terah\Saasu\Values\Value;
 
 /**
@@ -25,6 +26,7 @@ abstract class Entity
     /** @var RestClient */
     protected $saasu        = null;
     protected $entities     = [];
+    protected $filters      = [];
 
     public function __construct(RestClient $saasu)
     {
@@ -32,24 +34,36 @@ abstract class Entity
         Assert($this->entities)->keysExist(['singular', 'plural'])->all()->notEmpty("The keys have not been specified for the url segments.");
     }
 
-    public function create(Value $value)
+    /**
+     * @param RestableValue $value
+     * @return RestableValue
+     */
+    public function create(RestableValue $value)
     {
-        if ( ! empty($value->Id) )
+        if ( ! empty($value->getId()) )
         {
-            $value->Id = null;
+            $value->setId(null);
         }
         return $this->save($value);
     }
 
-    public function update(Value $value)
+    /**
+     * @param RestableValue $value
+     * @return RestableValue
+     */
+    public function update(RestableValue $value)
     {
-        Assert($value->Id)->id();
+        Assert($value->getId())->id();
         return $this->save($value);
     }
 
+    /**
+     * @param $id
+     * @return null|\stdClass|string
+     */
     public function delete($id)
     {
-        return $this->saasu->method(Client::DELETE)->sendRequest($this->getSingular());
+        return $this->saasu->method(Client::DELETE)->sendRequest($this->getSingular($id));
     }
 
     /**
@@ -62,71 +76,100 @@ abstract class Entity
     }
 
     /**
-     * @param array|null $filter
+     * @param array $filters
      *
-     * @return object
+     * @return RestableValue[]
      */
-    public function fetch(array $filter=[])
+    public function fetch(array $filters=[])
     {
-        $data   = $this->saasu->method(Client::FETCH)->data($filter)->sendRequest($this->getPlural());
-        $data   = isset($data[$this->entities['plural']]) ? $data[$this->entities['plural']] : [];
-        foreach ( $data as $idx => $item )
+        Assert($this->filters)->keysExist(array_keys($filters));
+
+        $plural     = $this->entities['plural'];
+        $nextUrl    = true;
+        $resultObjs = [];
+        while ( $nextUrl )
         {
-            $data[$idx] = $this->getValueObject($item);
+            $data       = $this->saasu->method(Client::FETCH)->data($filters)->sendRequest(strtolower($this->entities['plural']));
+            $linksData  = $data->_links;
+            $data       = isset($data->{$plural}) ? $data->{$plural} : [];
+            foreach ( $data as $idx => $item )
+            {
+                $resultObjs[] = $this->getValueObject($item);
+            }
+            if ( isset($filters['pagesize']) && count($data) < $filters['pagesize'] )
+            {
+                return $resultObjs;
+            }
+            $nextUrl = false;
+            foreach ( $linksData as $linkObj )
+            {
+                if ( $linkObj->rel !== 'next' )
+                {
+                    continue;
+                }
+                $urlParts               = (object)parse_url($linkObj->href);
+                parse_str($urlParts->query, $query);
+                $filters['page']        = (int)$query['page'];
+                $filters['pagesize']    = (int)$query['pagesize'];
+                $nextUrl                = true;
+            }
         }
-        return $data;
+
+        return $resultObjs;
     }
 
     /**
      * @param $id
-     * @return Entity
+     * @return RestableValue
      * @throws \Exception
      */
     public function fetchOne($id)
     {
         Assert($id)->integer("ID must be an integer");
-        $data = $this->saasu->method(Client::FETCH)->itemId($id)->sendRequest($this->getSingular());
+        $data = $this->saasu->method(Client::FETCH)->sendRequest($this->getSingular($id));
         return $this->getValueObject($data);
     }
 
     /**
      * @param string $keyedOn
      * @param string $valueField
-     * @param array $filter
+     * @param array $filters
      * @return array
      * @throws \Exception
      */
-    public function fetchList($keyedOn, $valueField, array $filter=[])
+    public function fetchList($keyedOn, $valueField, array $filters=[])
     {
-        //(new Assert($this->fields))->keysExist([$keyedOn, $valueField]);
-        $result = $this->saasu->method(Client::FETCH)->data($filter)->sendRequest($this->getPlural());
-        $result = isset($result[$this->entities['plural']]) ? $result[$this->entities['plural']] : [];
-        $data   = [];
-        foreach ( $result as $idx => $item )
+        $results    = $this->fetch($filters);
+        $data       = [];
+        foreach ( $results as $idx => $item )
         {
-            $data[$item[$keyedOn]] = $item[$valueField];
+            $data[$item->{$keyedOn}] = $item->{$valueField};
         }
         return $data;
     }
 
     /**
-     * @return object
+     * @param RestableValue $value
+     * @return RestableValue
      */
-    public function save(Value $value)
+    public function save(RestableValue $value)
     {
-        if ( is_null($value->Id) )
+        if ( is_null($value->getId()) )
         {
             $data = $this->saasu->method(Client::INSERT)->setValue($value)->sendRequest($this->getSingular());
+            return $value->set($data);
         }
-        $data = $this->saasu->method(Client::UPDATE)->setValue($value)->sendRequest($this->getSingular());
+        $data = $this->saasu->method(Client::UPDATE)->setValue($value)->sendRequest($this->getSingular($value->getId()));
+        return $value->set($data);
     }
 
     /**
      * @return string
      */
-    public function getSingular()
+    public function getSingular($id=null)
     {
-        return strtolower($this->entities['singular']);
+        $idReference = $id ? "/{$id}" : '';
+        return strtolower($this->entities['singular']) . $idReference;
     }
 
     /**

@@ -7,7 +7,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class Contact extends Value
+class Contact extends RestableValue
 {
     /**
      * Contact's Id in Saasu system.
@@ -265,13 +265,12 @@ class Contact extends Value
     public $_links                    = [];
 
     /**
-     * AccountDetail constructor.
-     *
      * @param \stdClass $data
+     * @return $this
      */
-    public function __construct(\stdClass $data)
+    public function set(\stdClass $data)
     {
-        parent::__construct($data);
+        parent::set($data);
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
@@ -312,6 +311,6 @@ class Contact extends Value
         {
             $this->PurchaseTradingTerms  = new TradingTerms($data->PurchaseTradingTerms);
         }
+        return $this;
     }
-
 }

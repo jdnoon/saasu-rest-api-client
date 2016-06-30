@@ -7,7 +7,7 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class InvoiceTransactionDetail extends Value
+class InvoiceTransactionDetail extends RestableValue
 {
     /**
      * The line items associated with this invoice.
@@ -311,13 +311,34 @@ class InvoiceTransactionDetail extends Value
     public $_links                           = [];
 
     /**
-     * InvoiceTransactionDetail constructor.
-     *
-     * @param \stdClass $data
+     * @return integer
      */
-    public function __construct(\stdClass $data)
+    public function getId()
+    {
+        return $this->TransactionId;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setId($value)
+    {
+        $this->TransactionId = $value;
+        return $this;
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return $this
+     */
+    public function set(\stdClass $data)
     {
         parent::__construct($data);
+        if ( isset($data->InsertId) )
+        {
+            $this->TransactionId = $data->InsertId;
+        }
         if ( isset($data->LineItems) && is_array($data->LineItems) )
         {
             foreach ( $data->LineItems as $lineItem )
@@ -344,6 +365,7 @@ class InvoiceTransactionDetail extends Value
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
+        return $this;
     }
 }
 
