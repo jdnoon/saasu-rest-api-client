@@ -33,7 +33,7 @@ class PaymentTransaction extends Value
     /**
      * The date the payment was received or made.
      * @required
-     * @var \DateTime
+     * @var DateTime
      */
     public $TransactionDate                  =  '';
 
@@ -77,7 +77,7 @@ class PaymentTransaction extends Value
 
     /**
      * The date the payment was cleared.
-     * @var \DateTime
+     * @var DateTime
      */
     public $ClearedDate                      =  null;
 
@@ -102,13 +102,13 @@ class PaymentTransaction extends Value
 
     /**
      * The date and time when this payment was created in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc                   =  '';
 
     /**
      * The date and time when this payment last modified in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc              =  '';
 

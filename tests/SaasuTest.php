@@ -2,6 +2,8 @@
 
 namespace Terah\Saasu\Test;
 
+require_once __DIR__ . '/../../../../vendor/autoload.php';
+
 use Terah\Saasu\RestClient;
 use Terah\Saasu\Account;
 use Terah\Saasu\Attachment;
@@ -12,6 +14,7 @@ use Terah\Saasu\Invoice;
 use Terah\Saasu\Item;
 use Terah\Saasu\Payment;
 use Terah\Saasu\TaxCode;
+use Terah\Saasu\Values\AccountDetail;
 
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,14 +27,42 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testAccount()
     {
-        $data       = [];
+        $rawData       = j('{
+      "Id": 1,
+      "Name": "Personal Loan Account",
+      "AccountLevel": "Detail",
+      "AccountType": "Liability",
+      "IsActive": true,
+      "IsBuiltIn": false,
+      "LastUpdatedId": "AAAAABr2Lgs=",
+      "DefaultTaxCode": null,
+      "LedgerCode": "11160",
+      "Currency": "AUD",
+      "HeaderAccountId": null,
+      "ExchangeAccountId": null,
+      "IsBankAccount": true,
+      "CreatedDateUtc": null,
+      "LastModifiedDateUtc": "2012-11-22T23:44:53.633",
+      "IncludeInForecaster": true,
+      "BSB": "114879",
+      "Number": "410 352 421",
+      "BankAccountName": "Sarah & Terry Cullen",
+      "BankFileCreationEnabled": false,
+      "BankCode": null,
+      "UserNumber": null,
+      "MerchantFeeAccountId": null,
+      "IncludePendingTransactions": false,
+      "_links": []
+}');
+        $data       = new AccountDetail($rawData);
+        $this->assertEquals(json_encode($rawData), json_encode($data));
         $saasu      = new Account($this->saasu);
-        $response   = $saasu->create(null, $data);
+        $response   = $saasu->create($data);
         $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
+        $response   = $saasu->update($data);
+        $response   = $saasu->fetch($filters);
         $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $response   = $saasu->fetchOne($id);
     }
 
     public function testAttachment()
@@ -129,4 +160,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $response   = $saasu->delete($id);
         $response   = $saasu->get($id);
     }
+}
+
+function j($json)
+{
+    return json_decode($json, false);
 }

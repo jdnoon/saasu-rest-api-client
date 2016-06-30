@@ -185,7 +185,7 @@ class InvoiceTransactionDetail extends Value
 
     /**
      * Date of this transaction.
-     * @var \DateTime
+     * @var DateTime
      */
     public $TransactionDate                  = '';
 
@@ -246,14 +246,14 @@ class InvoiceTransactionDetail extends Value
     /**
      * The date and time this resource was created in UTC.
      * This data is returned only and cannot be added or updated when issuing a POST or PUT.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc                   = '';
 
     /**
      * The date and time this resource was last modified in UTC.
      * This data is returned only and cannot be added or updated when issuing a POST or PUT.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc              = '';
 
@@ -267,7 +267,7 @@ class InvoiceTransactionDetail extends Value
 
     /**
      * The date that this invoice is due.
-     * @var \DateTime
+     * @var DateTime
      */
     public $DueDate                          = null;
 
@@ -338,11 +338,11 @@ class InvoiceTransactionDetail extends Value
         }
         if ( isset($data->CreatedDateUtc) )
         {
-            $this->CreatedDateUtc = new \DateTime($data->CreatedDateUtc);
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
-            $this->LastModifiedDateUtc = new \DateTime($data->LastModifiedDateUtc);
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
     }
 }

@@ -29,26 +29,28 @@ abstract class Entity
     public function __construct(RestClient $saasu)
     {
         $this->saasu = $saasu;
-        (new Assert($this->entities))->keysExist(['singular', 'plural'])->all()->notEmpty("The keys have not been specified for the url segments.");
+        Assert($this->entities)->keysExist(['singular', 'plural'])->all()->notEmpty("The keys have not been specified for the url segments.");
     }
 
     public function create(Value $value)
     {
-        unset($value->id);
+        if ( ! empty($value->Id) )
+        {
+            $value->Id = null;
+        }
         return $this->save($value);
     }
 
     public function update(Value $value)
     {
-        Assert($value->id)->id();
+        Assert($value->Id)->id();
         return $this->save($value);
     }
 
     public function delete($id)
     {
-        return $this->saasu->method(Client::DELETE)->sendRequest($this->getPlural());
+        return $this->saasu->method(Client::DELETE)->sendRequest($this->getSingular());
     }
-
 
     /**
      * @return $this
@@ -112,11 +114,11 @@ abstract class Entity
      */
     public function save(Value $value)
     {
-        if ( is_null($value->id) )
+        if ( is_null($value->Id) )
         {
-            $data = $this->saasu->method(Client::INSERT)->data($value)->sendRequest($this->getPlural());
+            $data = $this->saasu->method(Client::INSERT)->setValue($value)->sendRequest($this->getSingular());
         }
-        $data = $this->saasu->method(Client::UPDATE)->data($value)->sendRequest($this->getSingular());
+        $data = $this->saasu->method(Client::UPDATE)->setValue($value)->sendRequest($this->getSingular());
     }
 
     /**

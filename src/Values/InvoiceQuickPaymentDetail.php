@@ -13,13 +13,13 @@ class InvoiceQuickPaymentDetail extends Value
     /**
      * When the payment was made.
      * Required
-     * @var \DateTime
+     * @var DateTime
      */
     public $DatePaid            = null;
 
     /**
      * When the payment was cleared.
-     * @var \DateTime
+     * @var DateTime
      */
     public $DateCleared         = null;
 
@@ -59,11 +59,11 @@ class InvoiceQuickPaymentDetail extends Value
         parent::__construct($data);
         if ( isset($data->DatePaid) )
         {
-            $this->DatePaid = new \DateTime($data->DatePaid);
+            $this->DatePaid = new DateTime($data->DatePaid);
         }
         if ( isset($data->DateCleared) )
         {
-            $this->DateCleared = new \DateTime($data->DateCleared);
+            $this->DateCleared = new DateTime($data->DateCleared);
         }
     }
 }

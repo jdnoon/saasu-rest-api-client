@@ -84,13 +84,13 @@ class TaxCodeDetail extends Value
 
     /**
      * The date and time that this resource was created in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc          = '';
 
     /**
      * The date and time that this resource was last modified in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc     = '';
 

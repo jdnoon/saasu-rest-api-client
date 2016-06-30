@@ -17,13 +17,13 @@ class Contact extends Value
 
     /**
      * UTC date/time that contact was created in Saasu system.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc            = '';
 
     /**
      * UTC date/time that contact was last modified in Saasu system.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc       = '';
 
@@ -274,11 +274,11 @@ class Contact extends Value
         parent::__construct($data);
         if ( isset($data->CreatedDateUtc) )
         {
-            $this->CreatedDateUtc = new \DateTime($data->CreatedDateUtc);
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
-            $this->LastModifiedDateUtc = new \DateTime($data->LastModifiedDateUtc);
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
         if ( isset($data->DirectDepositDetails) )
         {

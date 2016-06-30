@@ -17,7 +17,8 @@ class RestClient extends \Terah\RestClient\RestClient
     {
         Assert($serviceUrl)->url('Invalid service URL');
         Assert($accessToken)->string('Invalid access token')->notEmpty('Invalid access token');
-        Assert($fileId)->notEmpty('Invalid file id')->int('Invalid file id');
+        Assert($fileId)->notEmpty('Invalid file id')->numeric('Invalid file id');
+        $this->fileId   = $fileId;
         parent::__construct($serviceUrl, $accessToken);
     }
 
@@ -37,5 +38,15 @@ class RestClient extends \Terah\RestClient\RestClient
             $query          = array_merge($query, $this->data);
         }
         $this->curlUrl = rtrim($this->curlUrl, '?') . '?' . http_build_query($query);
+    }
+
+    /**
+     * @param $data
+     * @return $this
+     */
+    public function setValue($data)
+    {
+        $this->data = $data;
+        return $this;
     }
 }

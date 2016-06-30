@@ -182,13 +182,13 @@ class ItemDetail extends Value
 
     /**
      * The date and time that the item was created in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc           = '';
 
     /**
      * The date and time that the item was modified in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc      = '';
 
@@ -219,14 +219,14 @@ class ItemDetail extends Value
     /**
      * If this item is a voucher (IsVoucher = true), this indicates the date and
      * time that the voucher item is valid from.
-     * @var \DateTime
+     * @var DateTime
      */
     public $ValidFrom                = '';
 
     /**
      * If this item is a voucher (IsVoucher = true), this indicates the date and
      * time that the voucher item is valid to.
-     * @var \DateTime
+     * @var DateTime
      */
     public $ValidTo                  = '';
 

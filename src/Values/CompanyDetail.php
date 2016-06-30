@@ -64,13 +64,13 @@ class CompanyDetail extends Value
 
     /**
      * Date and time that the company data was last modified in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $LastModifiedDateUtc     = '';
 
     /**
      * Date and time that the company was created in UTC.
-     * @var \DateTime
+     * @var DateTime
      */
     public $CreatedDateUtc          = '';
 
@@ -101,11 +101,11 @@ class CompanyDetail extends Value
         parent::__construct($data);
         if ( isset($data->CreatedDateUtc) )
         {
-            $this->CreatedDateUtc = new \DateTime($data->CreatedDateUtc);
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
-            $this->LastModifiedDateUtc = new \DateTime($data->LastModifiedDateUtc);
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
         }
     }
 
