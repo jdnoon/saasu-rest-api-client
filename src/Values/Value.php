@@ -33,12 +33,18 @@ abstract class Value
             if ( is_scalar($value) )
             {
                 $this->{$field} = $value;
+                unset($data->{$field});
                 continue;
             }
         }
         if ( ! empty($data->_links) )
         {
             $this->_links = $data->_links;
+            unset($data->{$field});
+        }
+        if ( ! empty($data->LastModified) && is_string($data->LastModified) )
+        {
+            $this->LastModified = new DateTime($this->LastModified);
         }
         return $this;
     }

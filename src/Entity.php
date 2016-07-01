@@ -84,23 +84,25 @@ abstract class Entity
     {
         Assert($this->filters)->keysExist(array_keys($filters));
 
-        $plural     = $this->entities['plural'];
-        $nextUrl    = true;
-        $resultObjs = [];
-        while ( $nextUrl )
+        $plural                 = $this->entities['plural'];
+        $resultObjs             = [];
+        $filters['pagesize']    = ! empty($filters['pagesize']) ? $filters['pagesize'] : 25;
+        $filters['page']        = ! empty($filters['page']) ? $filters['page'] : 1;
+        $maxIterations          = 100; // 2500 records
+        $count                  = 0;
+        while ( $count < $maxIterations )
         {
-            $data       = $this->saasu->method(Client::FETCH)->data($filters)->sendRequest(strtolower($this->entities['plural']));
-            $linksData  = $data->_links;
-            $data       = isset($data->{$plural}) ? $data->{$plural} : [];
+            $data           = $this->saasu->method(Client::FETCH)->data($filters)->sendRequest(strtolower($this->entities['plural']));
+            $linksData      = $data->_links;
+            $data           = isset($data->{$plural}) ? $data->{$plural} : [];
             foreach ( $data as $idx => $item )
             {
                 $resultObjs[] = $this->getValueObject($item);
             }
-            if ( isset($filters['pagesize']) && count($data) < $filters['pagesize'] )
+            if ( count($data) < $filters['pagesize'] )
             {
                 return $resultObjs;
             }
-            $nextUrl = false;
             foreach ( $linksData as $linkObj )
             {
                 if ( $linkObj->rel !== 'next' )
@@ -111,8 +113,8 @@ abstract class Entity
                 parse_str($urlParts->query, $query);
                 $filters['page']        = (int)$query['page'];
                 $filters['pagesize']    = (int)$query['pagesize'];
-                $nextUrl                = true;
             }
+            $count++;
         }
 
         return $resultObjs;
@@ -164,6 +166,7 @@ abstract class Entity
     }
 
     /**
+     * @param null|int $id
      * @return string
      */
     public function getSingular($id=null)

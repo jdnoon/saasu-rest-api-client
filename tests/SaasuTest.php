@@ -8,6 +8,7 @@ use Terah\Saasu\RestClient;
 use Terah\Saasu\Account;
 use Terah\Saasu\Attachment;
 use Terah\Saasu\Values\Contact as ContactDetail;
+use Terah\Saasu\Values\ContactAggregate as ContactAggregateDetail;
 use Terah\Saasu\Company;
 use Terah\Saasu\Contact;
 use Terah\Saasu\FileIdentity;
@@ -17,6 +18,7 @@ use Terah\Saasu\Payment;
 use Terah\Saasu\TaxCode;
 use Terah\Saasu\Values\AccountDetail;
 use Terah\Saasu\Values\CompanyDetail;
+use Terah\Saasu\ContactAggregate;
 use Terah\Saasu\Values\DateTime;
 use Terah\Saasu\Values\FileAttachment;
 
@@ -32,7 +34,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testAccount()
     {
         $rawData        = $this->getAccountTestData();
-        $valueObj       = new AccountDetail($rawData);
+        $valueObj       = new AccountDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
         $saasu          = new Account($this->saasu);
         $valueObj       = $saasu->create($valueObj);
@@ -54,10 +56,10 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($valueObjs);
         $valueObj       = $this->getObjectByName($valueObjs, $newName);
         $this->assertNotEmpty($valueObj);
-        $response       = $saasu->delete($valueObj->getId());
+        $saasu->delete($valueObj->getId());
         $badRequest    = function() use ($saasu, $valueObj)
         {
-            $response       = $saasu->fetchOne($valueObj->getId());
+            $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
 
@@ -66,7 +68,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testAttachment()
     {
         $rawData        = $this->getAttachmentTestData();
-        $valueObj       = new FileAttachment($rawData);
+        $valueObj       = new FileAttachment(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
         $saasu          = new Account($this->saasu);
         $valueObj       = $saasu->create($valueObj);
@@ -94,13 +96,12 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
             $response       = $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
-
     }
 
     public function testCompany()
     {
         $rawData        = $this->getCompanyTestData();
-        $valueObj       = new CompanyDetail($rawData);
+        $valueObj       = new CompanyDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
         $saasu          = new Company($this->saasu);
         $valueObj       = $saasu->create($valueObj);
@@ -124,41 +125,67 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $saasu->delete($valueObj->getId());
         $badRequest    = function() use ($saasu, $valueObj)
         {
-            $response       = $saasu->fetchOne($valueObj->getId());
+            $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
     }
 
     public function testContact()
     {
-        $rawData        = $this->getContactTestData();
-        $valueObj       = new ContactDetail($rawData);
+        $companyData            = $this->getCompanyTestData();
+        $companyObj             = new CompanyDetail(deepClone($companyData));
+        $companyReq             = new Company($this->saasu);
+        $companyObj             = $companyReq->create($companyObj);
+
+        $rawData                = $this->getContactTestData();
+        $valueObj               = new ContactDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu          = new Contact($this->saasu);
-        $valueObj       = $saasu->create($valueObj);
-        $idNumber       = $valueObj->getId();
+        $valueObj->CompanyId    = $companyObj->getId();
+        $saasu                  = new Contact($this->saasu);
+        $valueObj               = $saasu->create($valueObj);
+        $idNumber               = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
-        $valueObj       = $saasu->fetchOne($valueObj->getId());
+        $valueObj               = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
-        $newName        = $valueObj->Name . '-Test';
-        $valueObj->Name = $newName;
-        $valueObj       = $saasu->update($valueObj);
+        $newName                = $valueObj->FamilyName . '-Test';
+        $valueObj->FamilyName   = $newName;
+        $valueObj               = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
         $valueObjs      = $saasu->fetch([
             'LastModifiedFromDate'      => new DateTime('-1 mins'),
             'LastModifiedToDate'        => new DateTime('+1 mins'),
-            'CompanyName'               => $newName,
+            'FamilyName'                => $newName,
         ]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
-        $valueObj       = $this->getObjectByName($valueObjs, $newName);
+        $valueObj       = $this->getObjectByName($valueObjs, $newName, 'FamilyName');
         $this->assertNotEmpty($valueObj);
         $saasu->delete($valueObj->getId());
         $badRequest    = function() use ($saasu, $valueObj)
         {
-            $response       = $saasu->fetchOne($valueObj->getId());
+            $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
+    }
+
+    public function testContactAggregate()
+    {
+        $rawData                = $this->getContactAggregateTestData();
+        $valueObj               = new ContactAggregateDetail(deepClone($rawData));
+        $this->assertEquals(json_encode($rawData), json_encode($valueObj));
+        $saasu                  = new ContactAggregate($this->saasu);
+        $valueObj               = $saasu->create($valueObj);
+        $idNumber               = $valueObj->getId();
+        $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
+        $valueObj               = $saasu->fetchOne($valueObj->getId());
+        $this->assertEquals($idNumber, $valueObj->getId());
+        $newName                = $valueObj->FamilyName . '-Test';
+        $valueObj->FamilyName   = $newName;
+        $valueObj               = $saasu->update($valueObj);
+        $this->assertEquals($idNumber, $valueObj->getId());
+
+        $valueObj               = $saasu->fetchOne($valueObj->getId());
+        $this->assertEquals($newName, $valueObj->FamilyName);
     }
 
     public function testFileIdentity()
@@ -221,11 +248,11 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $response   = $saasu->get($id);
     }
 
-    protected function getObjectByName(array $values, $nameToMatch)
+    protected function getObjectByName(array $values, $nameToMatch, $field='Name')
     {
         foreach ( $values as $value )
         {
-            if ( $value->Name === $nameToMatch )
+            if ( $value->{$field} === $nameToMatch )
             {
                 return $value;
             }
@@ -319,13 +346,13 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $randomise     = microtime(true) . rand(5, 590000);
         return        j('{
   "Id": 1,
-  "CreatedDateUtc": "2016-06-19T21:07:25.7019212Z",
-  "LastModifiedDateUtc": "2016-06-29T21:07:25.7019212Z",
+  "CreatedDateUtc": "2016-06-19T21:07:25.701",
+  "LastModifiedDateUtc": "2016-06-19T21:07:25.701",
   "LastUpdatedId": "AAAAAFwWAN8=",
   "Salutation": "Mr.",
   "GivenName": "Joe",
   "MiddleInitials": null,
-  "FamilyName": "Blogs",
+  "FamilyName": "Blogs' . $randomise . '",
   "IsActive": true,
   "CompanyId": 3,
   "PositionTitle": "BigBoss",
@@ -396,9 +423,66 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
   "_links": []
 }');
     }
+
+    protected function getContactAggregateTestData()
+    {
+        $randomise     = microtime(true) . rand(5, 590000);
+        return        j('{
+  "Id": 54353,
+  "LastUpdatedId": "null",
+  "Salutation": "Mr.",
+  "GivenName": "Joe",
+  "MiddleInitials": null,
+  "FamilyName": "Blogs' . $randomise . '",
+  "Company": {
+    "Id": null,
+    "Name": "ACME Co",
+    "Abn": "12345618",
+    "LastUpdatedId": "null",
+    "LongDescription": "The ACME company Pty Ltd",
+    "TradingName": "ACME 2",
+    "CompanyEmail": "company@email.com",
+    "_links": []
+  },
+  "PositionTitle": "BigBoss",
+  "PrimaryPhone": "02 4444 5555",
+  "MobilePhone": null,
+  "HomePhone": "02 4564 7897",
+  "Fax": null,
+  "EmailAddress": null,
+  "ContactId": "1234",
+  "ContactManager": {
+    "Id": null,
+    "LastUpdatedId": "null",
+    "Salutation": "Mrs.",
+    "GivenName": "Joanne",
+    "MiddleInitials": "B",
+    "FamilyName": "Blogs",
+    "PositionTitle": "UberBoss",
+    "_links": []
+  },
+  "IsPartner": false,
+  "IsCustomer": false,
+  "IsSupplier": false,
+  "IsContractor": false,
+  "PostalAddress": {
+    "Street": "123 Acme Street",
+    "City": "Sydney",
+    "State": "NSW",
+    "Postcode": "2000",
+    "Country": "Australia"
+  },
+  "_links": []
+}');
+    }
 }
 
 function j($json)
 {
     return json_decode($json, false);
+}
+
+function deepClone($obj)
+{
+    return json_decode(json_encode($obj));
 }

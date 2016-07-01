@@ -19,31 +19,31 @@ class Contact extends RestableValue
      * UTC date/time that contact was created in Saasu system.
      * @var DateTime
      */
-    public $CreatedDateUtc            = '';
+    public $CreatedDateUtc            = null;
 
     /**
      * UTC date/time that contact was last modified in Saasu system.
      * @var DateTime
      */
-    public $LastModifiedDateUtc       = '';
+    public $LastModifiedDateUtc       = null;
 
     /**
      * Identifier used for concurrency checking. Required for update.
      * @var string
      */
-    public $LastUpdatedId             = '';
+    public $LastUpdatedId             = null;
 
     /**
      * The salutation or title of the contact. Valid values: Mr., Mrs., Ms., Dr., Prof.
      * @var string
      */
-    public $Salutation                = '';
+    public $Salutation                = null;
 
     /**
      * The first or given name of the contact.
      * @var string
      */
-    public $GivenName                 = '';
+    public $GivenName                 = null;
 
     /**
      * The middle initials of the contact.
@@ -55,7 +55,7 @@ class Contact extends RestableValue
      * The last name or surname of the contact.
      * @var string
      */
-    public $FamilyName                = '';
+    public $FamilyName                = null;
 
     /**
      * Indicates whether the contact is active.
@@ -73,55 +73,55 @@ class Contact extends RestableValue
      * Contact's position or role.
      * @var string
      */
-    public $PositionTitle             = '';
+    public $PositionTitle             = null;
 
     /**
      * Url of a website owned by the contact.
      * @var string
      */
-    public $WebsiteUrl                = '';
+    public $WebsiteUrl                = null;
 
     /**
      * Primary contact number for the contact.
      * @var string
      */
-    public $PrimaryPhone              = '';
+    public $PrimaryPhone              = null;
 
     /**
      * Home contact number for the contact.
      * @var string
      */
-    public $HomePhone                 = '';
+    public $HomePhone                 = null;
 
     /**
      * The contacts alternate or other phone number.
      * @var string
      */
-    public $OtherPhone                = '';
+    public $OtherPhone                = null;
 
     /**
      * The contact's mobile phone number.
      * @var string
      */
-    public $MobilePhone               = '';
+    public $MobilePhone               = null;
 
     /**
      * The contacts fax number.
      * @var string
      */
-    public $Fax                       = '';
+    public $Fax                       = null;
 
     /**
      * The contact's email address.
      * @var string
      */
-    public $EmailAddress              = '';
+    public $EmailAddress              = null;
 
     /**
      * Is used as an Account or Contact reference for this person if they are a supplier or customer. This is your reference or their reference depending on how you prefer to use this field.
      * @var string
      */
-    public $ContactId                 = '';
+    public $ContactId                 = null;
 
     /**
      * This is another Contact record in Saasu and is used to represent the Account Manager, Salesperson or similar for this Contact record.
@@ -145,31 +145,31 @@ class Contact extends RestableValue
      * Can be used to manage extra, customer specific information.
      * @var string
      */
-    public $CustomField1              = '';
+    public $CustomField1              = null;
 
     /**
      * A second field that can be used to manage extra, customer specific information.
      * @var string
      */
-    public $CustomField2              = '';
+    public $CustomField2              = null;
 
     /**
      * Twitter handle/id for this contact. This information is for your reference and is not used in Saasu at present.
      * @var string
      */
-    public $TwitterId                 = '';
+    public $TwitterId                 = null;
 
     /**
      * Skype name for this contact. This information is for your reference and is not used in Saasu at present.
      * @var string
      */
-    public $SkypeId                   = '';
+    public $SkypeId                   = null;
 
     /**
      * LinkedIn profile name for this contact. This information is for your reference and is not used in Saasu at present.
      * @var string
      */
-    public $LinkedInProfile           = '';
+    public $LinkedInProfile           = null;
 
     /**
      * Determines whether statements will be automatically sent to this contact if they have any outstanding receivables.
@@ -270,47 +270,61 @@ class Contact extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        parent::set($data);
+        if ( isset($data->InsertedContactId) )
+        {
+            $this->setId($data->InsertedContactId);
+            unset($data->InsertedContactId);
+        }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
         }
         if ( isset($data->DirectDepositDetails) )
         {
             $this->DirectDepositDetails = new DirectDepositDetails($data->DirectDepositDetails);
+            unset($data->DirectDepositDetails);
         }
         if ( isset($data->ChequeDetails) )
         {
             $this->ChequeDetails = new ChequeDetails($data->ChequeDetails);
+            unset($data->ChequeDetails);
         }
         if ( isset($data->Tags ) )
         {
             $this->Tags  = $data->Tags;
+            unset($data->Tags);
         }
         if ( isset($data->BpayDetails ) )
         {
             $this->BpayDetails  = new BpayDetails($data->BpayDetails);
+            unset($data->BpayDetails);
         }
         if ( isset($data->PostalAddress ) )
         {
             $this->PostalAddress  = new Address($data->PostalAddress);
+            unset($data->PostalAddress);
         }
         if ( isset($data->OtherAddress ) )
         {
             $this->OtherAddress  = new Address($data->OtherAddress);
+            unset($data->OtherAddress);
         }
         if ( isset($data->SaleTradingTerms ) )
         {
             $this->SaleTradingTerms  = new TradingTerms($data->SaleTradingTerms);
+            unset($data->SaleTradingTerms);
         }
         if ( isset($data->PurchaseTradingTerms ) )
         {
             $this->PurchaseTradingTerms  = new TradingTerms($data->PurchaseTradingTerms);
+            unset($data->PurchaseTradingTerms);
         }
-        return $this;
+        return parent::set($data);
     }
 }

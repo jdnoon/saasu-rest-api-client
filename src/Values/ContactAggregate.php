@@ -21,19 +21,19 @@ class ContactAggregate extends RestableValue
      * Identifier used for concurrency checking. Required for update.
      * @var string
      */
-    public $LastUpdatedId             = '';
+    public $LastUpdatedId             = null;
 
     /**
      * The salutation or title of the contact. Valid values: Mr., Mrs., Ms., Dr., Prof.
      * @var string
      */
-    public $Salutation                = '';
+    public $Salutation                = null;
 
     /**
      * The first or given name of the contact.
      * @var string
      */
-    public $GivenName                 = '';
+    public $GivenName                 = null;
 
     /**
      * The middle initials of the contact.
@@ -45,7 +45,7 @@ class ContactAggregate extends RestableValue
      * The last name or surname of the contact.
      * @var string
      */
-    public $FamilyName                = '';
+    public $FamilyName                = null;
 
     /**
      * Indicates whether the contact is active.
@@ -57,50 +57,44 @@ class ContactAggregate extends RestableValue
      * Contact's position or role.
      * @var string
      */
-    public $PositionTitle             = '';
-
-    /**
-     * Url of a website owned by the contact.
-     * @var string
-     */
-    public $WebsiteUrl                = '';
+    public $PositionTitle             = null;
 
     /**
      * Primary contact number for the contact.
      * @var string
      */
-    public $PrimaryPhone              = '';
+    public $PrimaryPhone              = null;
 
     /**
      * The contact's mobile phone number.
      * @var string
      */
-    public $MobilePhone               = '';
+    public $MobilePhone               = null;
 
     /**
      * Home contact number for the contact.
      * @var string
      */
-    public $HomePhone                 = '';
+    public $HomePhone                 = null;
 
     /**
      * The contacts fax number.
      * @var string
      */
-    public $Fax                       = '';
+    public $Fax                       = null;
 
     /**
      * The contact's email address.
      * @var string
      */
-    public $EmailAddress              = '';
+    public $EmailAddress              = null;
 
     /**
      * Is used as an Account or Contact reference for this person if they are a supplier or customer.
      * This is your reference or their reference depending on how you prefer to use this field.
      * @var string
      */
-    public $ContactId                 = '';
+    public $ContactId                 = null;
 
     /**
      * This is another Contact record in Saasu and is used to represent the
@@ -154,19 +148,26 @@ class ContactAggregate extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        parent::set($data);
+        if ( isset($data->InsertedContactId) )
+        {
+            $this->setId($data->InsertedContactId);
+            unset($data->InsertedContactId);
+        }
         if ( isset($data->Company) )
         {
             $this->Company  = new Company($data->Company);
+            unset($data->Company);
         }
         if ( isset($data->ContactManager) )
         {
             $this->ContactManager = new ContactManager($data->ContactManager);
+            unset($data->ContactManager);
         }
         if ( isset($data->PostalAddress ) )
         {
             $this->PostalAddress  = new Address($data->PostalAddress);
+            unset($data->PostalAddress);
         }
-        return $this;
+        return parent::set($data);
     }
 }

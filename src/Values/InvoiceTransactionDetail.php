@@ -334,10 +334,10 @@ class InvoiceTransactionDetail extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        parent::__construct($data);
         if ( isset($data->InsertId) )
         {
             $this->TransactionId = $data->InsertId;
+            unset($data->InsertId);
         }
         if ( isset($data->LineItems) && is_array($data->LineItems) )
         {
@@ -345,10 +345,12 @@ class InvoiceTransactionDetail extends RestableValue
             {
                 $this->LineItems[] = new InvoiceTransactionLineItem($lineItem);
             }
+            unset($data->LineItems);
         }
         if ( isset($data->Terms ) )
         {
             $this->Terms  = new TradingTerms($data->Terms);
+            unset($data->Terms);
         }
         if ( isset($data->Attachments) && is_array($data->Attachments) )
         {
@@ -356,16 +358,19 @@ class InvoiceTransactionDetail extends RestableValue
             {
                 $this->Attachments[] = new FileAttachmentInfo($attachment);
             }
+            unset($data->Attachments);
         }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
         }
-        return $this;
+        return parent::set($data);
     }
 }
 

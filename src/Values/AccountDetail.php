@@ -168,19 +168,21 @@ class AccountDetail extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        parent::set($data);
         if ( isset($data->InsertedEntityId) )
         {
             $this->setId($data->InsertedEntityId);
+            unset($data->InsertedEntityId);
         }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
         }
-        return $this;
+        return parent::set($data);
     }
 }

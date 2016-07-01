@@ -116,16 +116,16 @@ class FileIdentityDetail extends Value
     public $_links                           =  [];
 
     /**
-     * FileIdentityDetail constructor.
-     *
      * @param \stdClass $data
+     * @return $this
      */
-    public function __construct(\stdClass $data)
+    public function set(\stdClass $data)
     {
-        parent::__construct($data);
         if ( isset($data->FileSettings ) )
         {
             $this->FileSettings  = new FileSettings($data->FileSettings);
+            unset($data->FileSettings);
         }
+        return parent::set($data);
     }
 }

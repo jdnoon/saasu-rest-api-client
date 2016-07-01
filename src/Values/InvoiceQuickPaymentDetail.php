@@ -50,20 +50,21 @@ class InvoiceQuickPaymentDetail extends Value
     public $Summary             = '';
 
     /**
-     * InvoiceQuickPaymentDetail constructor.
-     *
      * @param \stdClass $data
+     * @return $this
      */
-    public function __construct(\stdClass $data)
+    public function set(\stdClass $data)
     {
-        parent::__construct($data);
         if ( isset($data->DatePaid) )
         {
             $this->DatePaid = new DateTime($data->DatePaid);
+            unset($data->DatePaid);
         }
         if ( isset($data->DateCleared) )
         {
             $this->DateCleared = new DateTime($data->DateCleared);
+            unset($data->DateCleared);
         }
+        return parent::set($data);
     }
 }

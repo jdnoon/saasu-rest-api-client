@@ -55,7 +55,7 @@ class CompanyDetail extends RestableValue
      * @var string
      */
     public $TradingName             = null;
-    
+
     /**
      * Company email address.
      * @var string
@@ -97,20 +97,22 @@ class CompanyDetail extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        parent::set($data);
         if ( isset($data->InsertedCompanyId) )
         {
             $this->setId($data->InsertedCompanyId);
+            unset($data->InsertedCompanyId);
         }
         if ( isset($data->CreatedDateUtc) )
         {
             $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
         }
         if ( isset($data->LastModifiedDateUtc) )
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
         }
-        return $this;
+        return parent::set($data);
     }
 
 }
