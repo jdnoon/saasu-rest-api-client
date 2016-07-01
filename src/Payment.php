@@ -2,64 +2,31 @@
 
 namespace Terah\Saasu;
 
+use Terah\Saasu\Values\PaymentItem;
+
 /**
- * Class Attachment
- * @package Terah\Saasu
+ * Class Item
  *
- * @property string Notes
- * @property PaymentItem[] PaymentItems
- * @property int TransactionId
- * @property \DateTime TransactionDate
- * @property string TransactionType
- * @property int PaymentAccountId
- * @property float TotalAmount
- * @property float FeeAmount
- * @property string Summary
- * @property string Reference
- * @property \DateTime ClearedDate
- * @property string Currency
- * @property bool AutoPopulateFxRate
- * @property float FxRate
- * @property \DateTime CreatedDateUtc
- * @property \DateTime LastModifiedDateUtc
- * @property int LastUpdatedId
- * @property bool RequiresFollowUp
- * @property array _links
+ * @package Terah\Saasu
  */
 class Payment extends Entity
 {
-    protected $entities         = [
-        'singular'                  => 'Company',
-        'plural'                    => 'Companies'
-    ];
+    use EntityFetchOneTrait;
+    use EntityFetchTrait;
+    use EntityCreateTrait;
+    use EntityUpdateTrait;
+    use EntityDeleteTrait;
 
-    protected $fields               = [
-        'Notes'                             =>  '',
-        'PaymentItems'                      =>  [],
-        'TransactionId'                     =>  null,
-        'TransactionDate'                   =>  '',
-        'TransactionType'                   =>  '',
-        'PaymentAccountId'                  =>  null,
-        'TotalAmount'                       =>  0,
-        'FeeAmount'                         =>  0,
-        'Summary'                           =>  '',
-        'Reference'                         =>  '',
-        'ClearedDate'                       =>  null,
-        'Currency'                          =>  'AUD',
-        'AutoPopulateFxRate'                =>  false,
-        'FxRate'                            =>  0,
-        'CreatedDateUtc'                    =>  null,
-        'LastModifiedDateUtc'               =>  null,
-        'LastUpdatedId'                     =>  null,
-        'RequiresFollowUp'                  =>  false,
-        '_links'                            =>  []
-    ];
-}
+    protected $singularAttribute    = 'Payment';
+    protected $pluralAttribute      = 'Payments';
+    protected $filters              = [];
 
-class PaymentItem
-{
-    /** @var int */
-    public $InvoiceTransactionId        = null;
-    /** @var float */
-    public $AmountPaid                  = null;
+    /**
+     * @param \stdClass $data
+     * @return PaymentItem
+     */
+    protected function getValueObject(\stdClass $data)
+    {
+        return new PaymentItem($data);
+    }
 }

@@ -6,23 +6,20 @@ use function Terah\Assert\Assert;
 use Terah\Saasu\Values\RestableValue;
 
 /**
- * Class Attachment
+ * Class InvoiceAttachment
+ *
  * @package Terah\Saasu
- * @property string AttachmentData
- * @property bool AllowExistingAttachmentToBeOverwritten
- * @property string Name
- * @property string Description
- * @property int ItemIdAttachedTo
- * @property array _links
  */
-class Attachment extends Entity
+class InvoiceAttachment extends Entity
 {
-    protected $entities         = [
-        'singular'                  => 'InvoiceAttachment',
-        'plural'                    => 'InvoiceAttachments'
-    ];
+    use EntityFetchOneTrait;
+    use EntityFetchTrait;
+    use EntityCreateTrait;
+    use EntityDeleteTrait;
 
-    protected $filters          = [];
+    protected $singularAttribute    = 'InvoiceAttachment';
+    protected $pluralAttribute      = 'InvoiceAttachments';
+    protected $filters              = [];
 
     /**
      * @param \stdClass $data
@@ -42,8 +39,8 @@ class Attachment extends Entity
     {
         Assert($filters)->keyExists('InvoiceId');
         Assert($filters['InvoiceId'])->id();
-        $this->entities['plural'] = "Attachments/{$filters['InvoiceId']}";
+        $this->pluralAttribute = "Attachments/{$filters['InvoiceId']}";
         unset($filters['InvoiceId']);
-        return parent::fetch($filters);
+        return $this->_fetchAll($filters);
     }
 }

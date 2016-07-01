@@ -11,42 +11,11 @@ use Terah\Saasu\Values\ContactAggregate as ContactAggregateDetail;
  */
 class ContactAggregate extends Entity
 {
-    /**
-     * @var array
-     */
-    protected $entities = [
-        'singular'          => 'ContactAggregate',
-        'plural'            => 'NotApplicable',
-    ];
+    use EntityFetchOneTrait;
+    use EntityCreateTrait;
+    use EntityUpdateTrait;
 
-    /**
-     * @var array
-     */
-    protected $filters          = [];
-
-    /**
-     * @param array $filters
-     * @return ContactAggregateDetail
-     * @throws \Exception
-     */
-    public function fetch(array $filters=[])
-    {
-        throw new \Exception('Cannot call fetch on ContactAggregate types');
-        return $this->getValueObject((object)[]);
-    }
-
-    /**
-     * @param string $keyedOn
-     * @param string $valueField
-     * @param array  $filters
-     * @return array
-     * @throws \Exception
-     */
-    public function fetchList($keyedOn, $valueField, array $filters=[])
-    {
-        throw new \Exception('Cannot call fetch on ContactAggregate types');
-        return [];
-    }
+    protected $singularAttribute    = 'ContactAggregate';
 
     /**
      * @param \stdClass $data

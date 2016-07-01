@@ -21,6 +21,7 @@ use Terah\Saasu\Values\CompanyDetail;
 use Terah\Saasu\ContactAggregate;
 use Terah\Saasu\Values\DateTime;
 use Terah\Saasu\Values\FileAttachment;
+use Terah\Saasu\Values\FileIdentityDetail;
 
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,97 +34,96 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testAccount()
     {
-        $rawData        = $this->getAccountTestData();
-        $valueObj       = new AccountDetail(deepClone($rawData));
+        $rawData  = $this->getAccountTestData();
+        $valueObj = new AccountDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu          = new Account($this->saasu);
-        $valueObj       = $saasu->create($valueObj);
-        $idNumber       = $valueObj->getId();
+        $saasu    = new Account($this->saasu);
+        $valueObj = $saasu->create($valueObj);
+        $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create account detail');
-        $valueObj       = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
         $newName        = $valueObj->Name . '-Test';
         $valueObj->Name = $newName;
         $valueObj       = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
-        $valueObjs      = $saasu->fetch([
-            'IsBankAccount'     => true,
-            'IsActive'          => true,
-            'IncludeBuiltIn'    => false,
-            'PageSize'          => 25
+        $valueObjs = $saasu->fetch([
+            'IsBankAccount'  => true,
+            'IsActive'       => true,
+            'IncludeBuiltIn' => false,
+            'PageSize'       => 25
         ]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
-        $valueObj       = $this->getObjectByName($valueObjs, $newName);
+        $valueObj = $this->getObjectByName($valueObjs, $newName);
         $this->assertNotEmpty($valueObj);
         $saasu->delete($valueObj->getId());
-        $badRequest    = function() use ($saasu, $valueObj)
+        $badRequest = function () use ($saasu, $valueObj)
         {
             $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
-
     }
 
     public function testAttachment()
     {
-        $rawData        = $this->getAttachmentTestData();
-        $valueObj       = new FileAttachment(deepClone($rawData));
+        $rawData  = $this->getAttachmentTestData();
+        $valueObj = new FileAttachment(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu          = new Account($this->saasu);
-        $valueObj       = $saasu->create($valueObj);
-        $idNumber       = $valueObj->getId();
+        $saasu    = new Account($this->saasu);
+        $valueObj = $saasu->create($valueObj);
+        $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create account detail');
-        $valueObj       = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
         $newName        = $valueObj->Name . '-Test';
         $valueObj->Name = $newName;
         $valueObj       = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
-        $valueObjs      = $saasu->fetch([
-            'IsBankAccount'     => true,
-            'IsActive'          => true,
-            'IncludeBuiltIn'    => false,
-            'PageSize'          => 25
+        $valueObjs = $saasu->fetch([
+            'IsBankAccount'  => true,
+            'IsActive'       => true,
+            'IncludeBuiltIn' => false,
+            'PageSize'       => 25
         ]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
-        $valueObj       = $this->getObjectByName($valueObjs, $newName);
+        $valueObj = $this->getObjectByName($valueObjs, $newName);
         $this->assertNotEmpty($valueObj);
-        $response       = $saasu->delete($valueObj->getId());
-        $badRequest    = function() use ($saasu, $valueObj)
+        $response   = $saasu->delete($valueObj->getId());
+        $badRequest = function () use ($saasu, $valueObj)
         {
-            $response       = $saasu->fetchOne($valueObj->getId());
+            $response = $saasu->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
     }
 
     public function testCompany()
     {
-        $rawData        = $this->getCompanyTestData();
-        $valueObj       = new CompanyDetail(deepClone($rawData));
+        $rawData  = $this->getCompanyTestData();
+        $valueObj = new CompanyDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu          = new Company($this->saasu);
-        $valueObj       = $saasu->create($valueObj);
-        $idNumber       = $valueObj->getId();
+        $saasu    = new Company($this->saasu);
+        $valueObj = $saasu->create($valueObj);
+        $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
-        $valueObj       = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
         $newName        = $valueObj->Name . '-Test';
         $valueObj->Name = $newName;
         $valueObj       = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
-        $valueObjs      = $saasu->fetch([
-            'LastModifiedFromDate'      => new DateTime('-1 mins'),
-            'LastModifiedToDate'        => new DateTime('+1 mins'),
-            'CompanyName'               => $newName,
+        $valueObjs = $saasu->fetch([
+            'LastModifiedFromDate' => new DateTime('-1 mins'),
+            'LastModifiedToDate'   => new DateTime('+1 mins'),
+            'CompanyName'          => $newName,
         ]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
-        $valueObj       = $this->getObjectByName($valueObjs, $newName);
+        $valueObj = $this->getObjectByName($valueObjs, $newName);
         $this->assertNotEmpty($valueObj);
         $saasu->delete($valueObj->getId());
-        $badRequest    = function() use ($saasu, $valueObj)
+        $badRequest = function () use ($saasu, $valueObj)
         {
             $saasu->fetchOne($valueObj->getId());
         };
@@ -132,36 +132,36 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testContact()
     {
-        $companyData            = $this->getCompanyTestData();
-        $companyObj             = new CompanyDetail(deepClone($companyData));
-        $companyReq             = new Company($this->saasu);
-        $companyObj             = $companyReq->create($companyObj);
+        $companyData = $this->getCompanyTestData();
+        $companyObj  = new CompanyDetail(deepClone($companyData));
+        $companyReq  = new Company($this->saasu);
+        $companyObj  = $companyReq->create($companyObj);
 
-        $rawData                = $this->getContactTestData();
-        $valueObj               = new ContactDetail(deepClone($rawData));
+        $rawData  = $this->getContactTestData();
+        $valueObj = new ContactDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $valueObj->CompanyId    = $companyObj->getId();
-        $saasu                  = new Contact($this->saasu);
-        $valueObj               = $saasu->create($valueObj);
-        $idNumber               = $valueObj->getId();
+        $valueObj->CompanyId = $companyObj->getId();
+        $saasu               = new Contact($this->saasu);
+        $valueObj            = $saasu->create($valueObj);
+        $idNumber            = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
-        $valueObj               = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
-        $newName                = $valueObj->FamilyName . '-Test';
-        $valueObj->FamilyName   = $newName;
-        $valueObj               = $saasu->update($valueObj);
+        $newName              = $valueObj->FamilyName . '-Test';
+        $valueObj->FamilyName = $newName;
+        $valueObj             = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
-        $valueObjs      = $saasu->fetch([
-            'LastModifiedFromDate'      => new DateTime('-1 mins'),
-            'LastModifiedToDate'        => new DateTime('+1 mins'),
-            'FamilyName'                => $newName,
+        $valueObjs = $saasu->fetch([
+            'LastModifiedFromDate' => new DateTime('-1 mins'),
+            'LastModifiedToDate'   => new DateTime('+1 mins'),
+            'FamilyName'           => $newName,
         ]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
-        $valueObj       = $this->getObjectByName($valueObjs, $newName, 'FamilyName');
+        $valueObj = $this->getObjectByName($valueObjs, $newName, 'FamilyName');
         $this->assertNotEmpty($valueObj);
         $saasu->delete($valueObj->getId());
-        $badRequest    = function() use ($saasu, $valueObj)
+        $badRequest = function () use ($saasu, $valueObj)
         {
             $saasu->fetchOne($valueObj->getId());
         };
@@ -170,85 +170,85 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testContactAggregate()
     {
-        $rawData                = $this->getContactAggregateTestData();
-        $valueObj               = new ContactAggregateDetail(deepClone($rawData));
+        $rawData  = $this->getContactAggregateTestData();
+        $valueObj = new ContactAggregateDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu                  = new ContactAggregate($this->saasu);
-        $valueObj               = $saasu->create($valueObj);
-        $idNumber               = $valueObj->getId();
+        $saasu    = new ContactAggregate($this->saasu);
+        $valueObj = $saasu->create($valueObj);
+        $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
-        $valueObj               = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($idNumber, $valueObj->getId());
-        $newName                = $valueObj->FamilyName . '-Test';
-        $valueObj->FamilyName   = $newName;
-        $valueObj               = $saasu->update($valueObj);
+        $newName              = $valueObj->FamilyName . '-Test';
+        $valueObj->FamilyName = $newName;
+        $valueObj             = $saasu->update($valueObj);
         $this->assertEquals($idNumber, $valueObj->getId());
 
-        $valueObj               = $saasu->fetchOne($valueObj->getId());
+        $valueObj = $saasu->fetchOne($valueObj->getId());
         $this->assertEquals($newName, $valueObj->FamilyName);
     }
 
     public function testFileIdentity()
     {
-        $data       = [];
-        $saasu      = new FileIdentity($this->saasu);
-        $response   = $saasu->create(null, $data);
-        $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
-        $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $saasu     = new FileIdentity($this->saasu);
+        $valueObjs = $saasu->fetch([]);
+        $this->assertTrue(is_array($valueObjs));
+        $this->assertNotEmpty($valueObjs);
+        $valueObj = $valueObjs[0];
+        $idNumber = $valueObj->getId();
+        $valueObj = $saasu->fetchOne($idNumber);
+        $this->assertEquals($idNumber, $valueObj->getId());
     }
 
     public function testInvoice()
     {
-        $data       = [];
-        $saasu      = new Invoice($this->saasu);
-        $response   = $saasu->create(null, $data);
-        $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
-        $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $data     = [];
+        $saasu    = new Invoice($this->saasu);
+        $response = $saasu->create(null, $data);
+        $response = $saasu->fetchOne($response->something);
+        $response = $saasu->update($id, $data);
+        $response = $saasu->get($filters);
+        $response = $saasu->delete($id);
+        $response = $saasu->get($id);
     }
 
     public function testItem()
     {
-        $data       = [];
-        $saasu      = new Item($this->saasu);
-        $response   = $saasu->create(null, $data);
-        $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
-        $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $data     = [];
+        $saasu    = new Item($this->saasu);
+        $response = $saasu->create(null, $data);
+        $response = $saasu->fetchOne($response->something);
+        $response = $saasu->update($id, $data);
+        $response = $saasu->get($filters);
+        $response = $saasu->delete($id);
+        $response = $saasu->get($id);
     }
 
     public function testPayment()
     {
-        $data       = [];
-        $saasu      = new Payment($this->saasu);
-        $response   = $saasu->create(null, $data);
-        $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
-        $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $data     = [];
+        $saasu    = new Payment($this->saasu);
+        $response = $saasu->create(null, $data);
+        $response = $saasu->fetchOne($response->something);
+        $response = $saasu->update($id, $data);
+        $response = $saasu->get($filters);
+        $response = $saasu->delete($id);
+        $response = $saasu->get($id);
     }
 
     public function testTaxCode()
     {
-        $data       = [];
-        $saasu      = new TaxCode($this->saasu);
-        $response   = $saasu->create(null, $data);
-        $response   = $saasu->fetchOne($response->something);
-        $response   = $saasu->update($id, $data);
-        $response   = $saasu->get($filters);
-        $response   = $saasu->delete($id);
-        $response   = $saasu->get($id);
+        $data     = [];
+        $saasu    = new TaxCode($this->saasu);
+        $response = $saasu->create(null, $data);
+        $response = $saasu->fetchOne($response->something);
+        $response = $saasu->update($id, $data);
+        $response = $saasu->get($filters);
+        $response = $saasu->delete($id);
+        $response = $saasu->get($id);
     }
 
-    protected function getObjectByName(array $values, $nameToMatch, $field='Name')
+    protected function getObjectByName(array $values, $nameToMatch, $field = 'Name')
     {
         foreach ( $values as $value )
         {
@@ -262,24 +262,30 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = null, $expectedMessage = null)
     {
-        if (!class_exists($expectedException) && !interface_exists($expectedException)) {
+        if ( ! class_exists($expectedException) && ! interface_exists($expectedException) )
+        {
             $this->fail("An exception of type '$expectedException' does not exist.");
         }
 
-        try {
+        try
+        {
             $callback();
-        } catch (\Exception $e) {
-            $class = get_class($e);
+        }
+        catch (\Exception $e)
+        {
+            $class   = get_class($e);
             $message = $e->getMessage();
-            $code = $e->getCode();
+            $code    = $e->getCode();
 
-            $extraInfo = $message ? " (message was $message, code was $code)" : ($code ? " (code was $code)" : '');
+            $extraInfo = $message ? " (message was $message, code was $code)" : ( $code ? " (code was $code)" : '' );
             $this->assertInstanceOf($expectedException, $e, "Failed asserting the class of exception$extraInfo.");
 
-            if ($expectedCode !== null) {
+            if ( $expectedCode !== null )
+            {
                 $this->assertEquals($expectedCode, $code, "Failed asserting code of thrown $class.");
             }
-            if ($expectedMessage !== null) {
+            if ( $expectedMessage !== null )
+            {
                 $this->assertContains($expectedMessage, $message, "Failed asserting the message of thrown $class.");
             }
             return;
@@ -291,10 +297,10 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     protected function getAccountTestData()
     {
-        $randomise     = microtime(true) . rand(5, 590000);
+        $randomise = microtime(true) . rand(5, 590000);
         return j('{
       "Id": 1,
-      "Name": "Personal Loan Account' . $randomise. '",
+      "Name": "Personal Loan Account' . $randomise . '",
       "AccountLevel": "Detail",
       "AccountType": "Liability",
       "IsActive": true,
@@ -323,10 +329,10 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     protected function getCompanyTestData()
     {
-        $randomise     = microtime(true) . rand(5, 590000);
-        return        j('{
+        $randomise = microtime(true) . rand(5, 590000);
+        return j('{
   "Id": 1,
-  "Name": "Test Company' . $randomise .'",
+  "Name": "Test Company' . $randomise . '",
   "Abn": "12341234",
   "Website": null,
   "LastUpdatedId": "AAAAAJlkOcM=",
@@ -343,8 +349,8 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     protected function getContactTestData()
     {
-        $randomise     = microtime(true) . rand(5, 590000);
-        return        j('{
+        $randomise = microtime(true) . rand(5, 590000);
+        return j('{
   "Id": 1,
   "CreatedDateUtc": "2016-06-19T21:07:25.701",
   "LastModifiedDateUtc": "2016-06-19T21:07:25.701",
@@ -426,8 +432,8 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     protected function getContactAggregateTestData()
     {
-        $randomise     = microtime(true) . rand(5, 590000);
-        return        j('{
+        $randomise = microtime(true) . rand(5, 590000);
+        return j('{
   "Id": 54353,
   "LastUpdatedId": "null",
   "Salutation": "Mr.",
