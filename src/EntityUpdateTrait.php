@@ -7,8 +7,6 @@ use Terah\Saasu\Values\RestableValue;
 
 trait EntityUpdateTrait
 {
-    use RestClientTrait;
-
     /**
      * @param RestableValue $value
      * @return RestableValue
@@ -16,7 +14,7 @@ trait EntityUpdateTrait
     public function update(RestableValue $value)
     {
         Assert($value->getId())->id();
-        $data = $this->saasu->method(Client::UPDATE)->setValue($value)->sendRequest($this->getSingular($value->getId()));
+        $data = $this->restClient->method(Client::UPDATE)->setValue($value)->sendRequest($this->getSingular($value->getId()));
         return $value->set($data);
     }
 }

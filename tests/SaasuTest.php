@@ -25,42 +25,73 @@ use Terah\Saasu\Values\FileIdentityDetail;
 
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
-    public $saasu = null;
+    public $restClient = null;
 
     public function setUp()
     {
-        $this->saasu = new RestClient('https://api.saasu.com/', getenv('SAASU_TOKEN'), getenv('SAASU_FILE_ID'));
+        $this->restClient = new RestClient('https://api.saasu.com/', getenv('SAASU_TOKEN'), getenv('SAASU_FILE_ID'));
     }
 
     public function testAccount()
     {
+        // CREATION
+
+        // Fetch raw data for use in testing
         $rawData  = $this->getAccountTestData();
+        // Create a instance of AccountDetail (Bucket of data);
         $valueObj = new AccountDetail(deepClone($rawData));
+        // Check that the serialized (json_encoded) data
+        // is the same as the original raw data checking
+        // the the values don't damage the data
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu    = new Account($this->saasu);
-        $valueObj = $saasu->create($valueObj);
+        // Create a new transport object
+        $accountClient    = new Account($this->restClient);
+        // Now create a new account via http
+        $valueObj = $accountClient->create($valueObj);
+        // Get the id number from the newly created account
         $idNumber = $valueObj->getId();
+        // Check the id number exists
         $this->assertTrue(is_int($idNumber), 'Failed to create account detail');
-        $valueObj = $saasu->fetchOne($valueObj->getId());
+        // Fetch the new ojbject/record from saasu to make sure it was created correctly
+        $valueObj = $accountClient->fetchOne($valueObj->getId());
+        // Make sure the ids are the same
         $this->assertEquals($idNumber, $valueObj->getId());
+
+        // UPDATE
+        // Added test to the end of the name
         $newName        = $valueObj->Name . '-Test';
         $valueObj->Name = $newName;
-        $valueObj       = $saasu->update($valueObj);
+        // Update the name on the server
+        $valueObj       = $accountClient->update($valueObj);
+        // Check the response id is the same as it was
         $this->assertEquals($idNumber, $valueObj->getId());
-        $valueObjs = $saasu->fetch([
+
+
+        // FETCH MANY
+        // Add some filters for the search and fetch from the server
+        $valueObjs = $accountClient->fetch([
             'IsBankAccount'  => true,
             'IsActive'       => true,
             'IncludeBuiltIn' => false,
-            'PageSize'       => 25
+            'PageSize'       => 100
         ]);
+        // Make sure there is an array of values
         $this->assertTrue(is_array($valueObjs));
+        // Make sure that there is more than zero values
         $this->assertNotEmpty($valueObjs);
+        // Fetch the value that has our new name
         $valueObj = $this->getObjectByName($valueObjs, $newName);
+        // Make sure it was in the list from fetch()
         $this->assertNotEmpty($valueObj);
-        $saasu->delete($valueObj->getId());
-        $badRequest = function () use ($saasu, $valueObj)
+
+
+        // DELETES
+        // Delete the account via it's id.
+        $accountClient->delete($valueObj->getId());
+        // Create an expected failure (Exception) for fetch a supposed missing record
+        $badRequest = function () use ($accountClient, $valueObj)
         {
-            $saasu->fetchOne($valueObj->getId());
+            $accountClient->fetchOne($valueObj->getId());
         };
         $this->assertException($badRequest);
     }
@@ -70,7 +101,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $rawData  = $this->getAttachmentTestData();
         $valueObj = new FileAttachment(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu    = new Account($this->saasu);
+        $saasu    = new Account($this->restClient);
         $valueObj = $saasu->create($valueObj);
         $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create account detail');
@@ -103,7 +134,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $rawData  = $this->getCompanyTestData();
         $valueObj = new CompanyDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu    = new Company($this->saasu);
+        $saasu    = new Company($this->restClient);
         $valueObj = $saasu->create($valueObj);
         $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
@@ -134,14 +165,14 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     {
         $companyData = $this->getCompanyTestData();
         $companyObj  = new CompanyDetail(deepClone($companyData));
-        $companyReq  = new Company($this->saasu);
+        $companyReq  = new Company($this->restClient);
         $companyObj  = $companyReq->create($companyObj);
 
         $rawData  = $this->getContactTestData();
         $valueObj = new ContactDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
         $valueObj->CompanyId = $companyObj->getId();
-        $saasu               = new Contact($this->saasu);
+        $saasu               = new Contact($this->restClient);
         $valueObj            = $saasu->create($valueObj);
         $idNumber            = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
@@ -173,7 +204,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $rawData  = $this->getContactAggregateTestData();
         $valueObj = new ContactAggregateDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
-        $saasu    = new ContactAggregate($this->saasu);
+        $saasu    = new ContactAggregate($this->restClient);
         $valueObj = $saasu->create($valueObj);
         $idNumber = $valueObj->getId();
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
@@ -190,7 +221,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testFileIdentity()
     {
-        $saasu     = new FileIdentity($this->saasu);
+        $saasu     = new FileIdentity($this->restClient);
         $valueObjs = $saasu->fetch([]);
         $this->assertTrue(is_array($valueObjs));
         $this->assertNotEmpty($valueObjs);
@@ -203,7 +234,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testInvoice()
     {
         $data     = [];
-        $saasu    = new Invoice($this->saasu);
+        $saasu    = new Invoice($this->restClient);
         $response = $saasu->create(null, $data);
         $response = $saasu->fetchOne($response->something);
         $response = $saasu->update($id, $data);
@@ -215,7 +246,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testItem()
     {
         $data     = [];
-        $saasu    = new Item($this->saasu);
+        $saasu    = new Item($this->restClient);
         $response = $saasu->create(null, $data);
         $response = $saasu->fetchOne($response->something);
         $response = $saasu->update($id, $data);
@@ -227,7 +258,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testPayment()
     {
         $data     = [];
-        $saasu    = new Payment($this->saasu);
+        $saasu    = new Payment($this->restClient);
         $response = $saasu->create(null, $data);
         $response = $saasu->fetchOne($response->something);
         $response = $saasu->update($id, $data);
@@ -239,7 +270,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
     public function testTaxCode()
     {
         $data     = [];
-        $saasu    = new TaxCode($this->saasu);
+        $saasu    = new TaxCode($this->restClient);
         $response = $saasu->create(null, $data);
         $response = $saasu->fetchOne($response->something);
         $response = $saasu->update($id, $data);

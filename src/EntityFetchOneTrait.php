@@ -11,8 +11,6 @@ use Terah\Saasu\Values\RestableValue;
  */
 trait EntityFetchOneTrait
 {
-    use RestClientTrait;
-
     /**
      * @param $id
      * @return RestableValue
@@ -21,7 +19,7 @@ trait EntityFetchOneTrait
     public function fetchOne($id)
     {
         Assert($id)->integer("ID must be an integer");
-        $data = $this->saasu->method(Client::FETCH)->sendRequest($this->getSingular($id));
+        $data = $this->restClient->method(Client::FETCH)->sendRequest($this->getSingular($id));
         return $this->getValueObject($data);
     }
 }

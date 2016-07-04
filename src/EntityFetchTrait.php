@@ -7,8 +7,6 @@ use Terah\Saasu\Values\RestableValue;
 
 trait EntityFetchTrait
 {
-    use RestClientTrait;
-
     /**
      * @param string $keyedOn
      * @param string $valueField
@@ -54,7 +52,7 @@ trait EntityFetchTrait
         $count                  = 0;
         while ( $count < $maxIterations )
         {
-            $data           = $this->saasu->method(Client::FETCH)->data($filters)->sendRequest(strtolower($this->getPlural()));
+            $data           = $this->restClient->method(Client::FETCH)->data($filters)->sendRequest(strtolower($this->getPlural()));
             $linksData      = $data->_links;
             $data           = isset($data->{$plural}) ? $data->{$plural} : [];
             foreach ( $data as $idx => $item )

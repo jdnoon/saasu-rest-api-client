@@ -11,13 +11,15 @@
  */
 namespace Terah\Saasu;
 
+use function Terah\Assert\Assert;
+
 /**
  * Class Entity
  *
  * @package Terah\Saasu
  */
 abstract class Entity
-{å
+{
     /** @var RestClient */
     protected $saasu                = null;
     protected $filters              = [];
@@ -26,7 +28,7 @@ abstract class Entity
 
     public function __construct(RestClient $saasu)
     {
-        $this->saasu = $saasu;
+        $this->restClient = $saasu;
     }
 
     /**
@@ -55,7 +57,7 @@ abstract class Entity
      */
     public function reset()
     {
-        $this->saasu->reset();
+        $this->restClient->reset();
         return $this;
     }
 

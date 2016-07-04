@@ -7,8 +7,6 @@ use Terah\Saasu\Values\RestableValue;
 
 trait EntityCreateTrait
 {
-    use RestClientTrait;
-
     /**
      * @param RestableValue $value
      * @return RestableValue
@@ -19,7 +17,7 @@ trait EntityCreateTrait
         {
             $value->setId(null);
         }
-        $data = $this->saasu->method(Client::INSERT)->setValue($value)->sendRequest($this->getSingular());
+        $data = $this->restClient->method(Client::INSERT)->setValue($value)->sendRequest($this->getSingular());
         return $value->set($data);
     }
 }
