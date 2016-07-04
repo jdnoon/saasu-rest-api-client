@@ -42,9 +42,9 @@ abstract class Value
             $this->_links = $data->_links;
             unset($data->{$field});
         }
-        if ( ! empty($data->LastModified) && is_string($data->LastModified) )
+        if ( ! empty($data->UtcLastModified) && is_string($data->UtcLastModified) )
         {
-            $this->LastModified = new DateTime($this->LastModified);
+            $this->UtcLastModified = new DateTime($this->UtcLastModified);
         }
         return $this;
     }

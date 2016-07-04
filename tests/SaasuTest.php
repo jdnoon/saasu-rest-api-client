@@ -52,7 +52,7 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $idNumber = $valueObj->getId();
         // Check the id number exists
         $this->assertTrue(is_int($idNumber), 'Failed to create account detail');
-        // Fetch the new ojbject/record from saasu to make sure it was created correctly
+        // Fetch the new object/record from saasu to make sure it was created correctly
         $valueObj = $accountClient->fetchOne($valueObj->getId());
         // Make sure the ids are the same
         $this->assertEquals($idNumber, $valueObj->getId());

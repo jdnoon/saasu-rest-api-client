@@ -183,6 +183,16 @@ class AccountDetail extends RestableValue
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
             unset($data->LastModifiedDateUtc);
         }
+        if ( isset($data->LastModifiedDateUtc) )
+        {
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
+        }
+        if ( isset($data->UtcLastModified) )
+        {
+            $this->LastModifiedDateUtc = new DateTime($data->UtcLastModified);
+            unset($data->UtcLastModified);
+        }
         return parent::set($data);
     }
 }
