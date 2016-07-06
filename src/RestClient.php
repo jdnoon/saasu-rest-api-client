@@ -51,4 +51,13 @@ class RestClient extends \Terah\RestClient\RestClient
         $this->data = $data;
         return $this;
     }
+
+    /**
+     * @return RestResponse
+     */
+    protected function getResponseObj()
+    {
+        return new RestResponse();
+    }
+
 }

@@ -251,5 +251,48 @@ class ItemDetail extends RestableValue
      * @var array
      */
     public $_links                   = [];
+
+    /**
+     * @param \stdClass $data
+     * @return $this
+     */
+    public function set(\stdClass $data)
+    {
+        if ( isset($data->InsertedItemId) )
+        {
+            $this->Id = $data->InsertedItemId;
+            unset($data->InsertedItemId);
+        }
+        if ( isset($data->BuildItems) && is_array($data->BuildItems) )
+        {
+            foreach ( $data->BuildItems as $buildItem )
+            {
+                $this->BuildItems[] = new BuildItem($buildItem);
+            }
+            unset($data->BuildItems);
+        }
+        if ( isset($data->CreatedDateUtc) )
+        {
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
+        }
+        if ( isset($data->LastModifiedDateUtc) )
+        {
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
+        }
+        if ( isset($data->ValidFrom) )
+        {
+            $this->ValidFrom = new DateTime($data->ValidFrom);
+            unset($data->ValidFrom);
+        }
+        if ( isset($data->ValidTo) )
+        {
+            $this->ValidTo = new DateTime($data->ValidTo);
+            unset($data->ValidTo);
+        }
+        return parent::set($data);
+    }
+    
 }
 

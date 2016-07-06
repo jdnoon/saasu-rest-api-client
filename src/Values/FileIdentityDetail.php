@@ -20,85 +20,85 @@ class FileIdentityDetail extends RestableValue
      * File name used by the business in Saasu.
      * @var string
      */
-    public $Name                             = '';
+    public $Name                             = null;
 
     /**
      * Legal registered business name.
      * @var string
      */
-    public $FullLegalName                    = '';
+    public $FullLegalName                    = null;
 
     /**
      * 'Trading as' name or alternative brand name.
      * @var string
      */
-    public $TradingNameOrAlternativeBrandName= '';
+    public $TradingNameOrAlternativeBrandName= null;
 
     /**
      * Business identifier issued for the business(eg. ABN in Australia).
      * @var string
      */
-    public $BusinessIdentifier               = '';
+    public $BusinessIdentifier               = null;
 
     /**
      * Company identifier issued for the business(eg. ACN in Australia).
      * @var string
      */
-    public $CompanyIdentifier                = '';
+    public $CompanyIdentifier                = null;
 
     /**
      * Primary telephone number used by the business.
      * @var string
      */
-    public $PrimaryPhone                     = '';
+    public $PrimaryPhone                     = null;
 
     /**
      * Website used for the business.
      * @var string
      */
-    public $Website                          = '';
+    public $Website                          = null;
 
     /**
      * Primary email of the business.
      * @var string
      */
-    public $Email                            = '';
+    public $Email                            = null;
 
     /**
      * Street number and name of the business.
      * @var string
      */
-    public $Street                           = '';
+    public $Street                           = null;
 
     /**
      * City the business is located in.
      * @var string
      */
-    public $City                             = '';
+    public $City                             = null;
 
     /**
      * State the business is located in.
      * @var string
      */
-    public $State                            = '';
+    public $State                            = null;
 
     /**
      * Postcode where the business is located.
      * @var string
      */
-    public $PostCode                         = '';
+    public $PostCode                         = null;
 
     /**
      * The country where the business is located.
      * @var string
      */
-    public $Country                          = '';
+    public $Country                          = null;
 
     /**
      * Tax zone the business is operating from.
      * @var string
      */
-    public $Zone                             = '';
+    public $Zone                             = null;
 
     /**
      * Currency code of the payment eg: AUD or USD.

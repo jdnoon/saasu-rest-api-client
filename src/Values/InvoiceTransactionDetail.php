@@ -21,13 +21,13 @@ class InvoiceTransactionDetail extends RestableValue
      * Textual notes set by the system.
      * @var string
      */
-    public $NotesInternal                    = '';
+    public $NotesInternal                    = null;
 
     /**
      * Textual notes set by the user.
      * @var null
      */
-    public $NotesExternal                    = '';
+    public $NotesExternal                    = null;
 
     /**
      * The trading terms of the invoice.
@@ -53,7 +53,7 @@ class InvoiceTransactionDetail extends RestableValue
      * Instruct the system to send an email to the contact as part of the insert/update.
      * @var bool
      */
-    public $SendEmailToContact               = false;
+    public $SendEmailToContact               = null;
 
     /**
      * The Email message to send to the contact if instructed.
@@ -349,7 +349,7 @@ class InvoiceTransactionDetail extends RestableValue
         }
         if ( isset($data->Terms ) )
         {
-            $this->Terms  = new TradingTerms($data->Terms);
+            $this->Terms  = new InvoiceTradingTerms($data->Terms);
             unset($data->Terms);
         }
         if ( isset($data->Attachments) && is_array($data->Attachments) )
@@ -369,6 +369,11 @@ class InvoiceTransactionDetail extends RestableValue
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
             unset($data->LastModifiedDateUtc);
+        }
+        if ( isset($data->Tags ) )
+        {
+            $this->Tags  = $data->Tags;
+            unset($data->Tags);
         }
         return parent::set($data);
     }
