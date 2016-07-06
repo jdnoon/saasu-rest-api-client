@@ -523,3 +523,6 @@ function deepClone($obj)
 {
     return json_decode(json_encode($obj));
 }
+
+// cd /Users/jamesnoon/Projects/Saasu/vendor/terah/saasu-rest-api-client/tests
+// phpunit --filter=testAccounts SaasuTest.php

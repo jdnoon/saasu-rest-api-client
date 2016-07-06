@@ -4,6 +4,8 @@ namespace Terah\Saasu;
 
 use Terah\Saasu\Values\FileIdentityDetail;
 
+use function Terah\Assert\Assert;
+
 /**
  * Class FileIdentity
  *
@@ -27,6 +29,16 @@ class FileIdentity extends Entity
         // Maximum page size is 100. Defaults to 25 if not specified.	integer	None.
         'PageSize'                  => null,
     ];
+
+    /**
+     * @param null|int $id
+     * @return string
+     */
+    public function getSingular($id=null)
+    {
+        Assert($this->singularAttribute)->notEmpty();
+        return $this->singularAttribute;
+    }
 
     /**
      * @param \stdClass $data

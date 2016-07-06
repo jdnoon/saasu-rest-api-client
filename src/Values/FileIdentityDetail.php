@@ -7,8 +7,15 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
-class FileIdentityDetail extends Value
+class FileIdentityDetail extends RestableValue
 {
+
+    /**
+     * Id of record (Not documented)
+     * @var int
+     */
+    public $Id                              = null;
+
     /**
      * File name used by the business in Saasu.
      * @var string
