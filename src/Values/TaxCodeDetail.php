@@ -115,4 +115,29 @@ class TaxCodeDetail extends RestableValue
      * @var array
      */
     public $_links                  = [];
+
+    /**
+     * @param \stdClass $data
+     * @return $this
+     */
+    public function set(\stdClass $data)
+    {
+        if ( isset($data->InsertedItemId) )
+        {
+            $this->Id = $data->InsertedItemId;
+            unset($data->InsertedItemId);
+        }
+        if ( isset($data->CreatedDateUtc) )
+        {
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
+        }
+        if ( isset($data->LastModifiedDateUtc) )
+        {
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
+        }
+        return parent::set($data);
+    }
+
 }

@@ -4,15 +4,16 @@ namespace Terah\Saasu\Test;
 
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
+use Terah\Saasu\Invoice;
 use Terah\Saasu\Item;
 use Terah\Saasu\RestClient;
 use Terah\Saasu\Account;
+use Terah\Saasu\TaxCode;
 use Terah\Saasu\Values\Contact as ContactDetail;
 use Terah\Saasu\Values\ContactAggregate as ContactAggregateDetail;
 use Terah\Saasu\Company;
 use Terah\Saasu\Contact;
 use Terah\Saasu\FileIdentity;
-use Terah\Saasu\Invoice;
 use Terah\Saasu\Values\AccountDetail;
 use Terah\Saasu\Values\CompanyDetail;
 use Terah\Saasu\ContactAggregate;
@@ -20,6 +21,7 @@ use Terah\Saasu\Values\DateTime;
 use Terah\Saasu\Values\FileIdentityDetail;
 use Terah\Saasu\Values\InvoiceTransactionDetail;
 use Terah\Saasu\Values\ItemDetail;
+use Terah\Saasu\Values\TaxCodeDetail;
 
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
@@ -130,30 +132,59 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     public function testCompany()
     {
+        // CREATE
+
+        // Fetch raw data for use in testing
         $rawData  = $this->getCompanyTestData();
+        // Create a instance of AccountDetail (Bucket of data);
         $valueObj = new CompanyDetail(deepClone($rawData));
+        // Check that the serialized (json_encoded) data
+        // is the same as the original raw data checking
+        // the the values don't damage the data
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
+        // Create a new transport object
         $saasu    = new Company($this->restClient);
+        // Now create a new invoice via http
         $valueObj = $saasu->create($valueObj);
+        // Get the id number from the newly created account
         $idNumber = $valueObj->getId();
+        // Check the id number exists
         $this->assertTrue(is_int($idNumber), 'Failed to create company detail');
+        // Fetch the new object/record from saasu to make sure it was created correctly
         $valueObj = $saasu->fetchOne($valueObj->getId());
+        // Make sure the ids are the same
         $this->assertEquals($idNumber, $valueObj->getId());
-        /** @var CompanyDetail $valueObj */
+
+        // UPDATE
+        // Added test to the end of the name
+        /** @var AccountDetail $valueObj */
         $newName        = $valueObj->Name . '-Test';
         $valueObj->Name = $newName;
+        // Update the name on the server
         $valueObj       = $saasu->update($valueObj);
+        // Check the response id is the same as it was
         $this->assertEquals($idNumber, $valueObj->getId());
+
+        // FETCH MANY
+        // Add some filters for the search and fetch from the server
         $valueObjs = $saasu->fetch([
             'LastModifiedFromDate' => new DateTime('-1 mins'),
             'LastModifiedToDate'   => new DateTime('+1 mins'),
             'CompanyName'          => $newName,
         ]);
+        // Make sure there is an array of values
         $this->assertTrue(is_array($valueObjs));
+        // Make sure that there is more than zero values
         $this->assertNotEmpty($valueObjs);
+        // Fetch the value that has our new name
         $valueObj = $this->getObjectByName($valueObjs, $newName);
+        // Make sure it was in the list from fetch()
         $this->assertNotEmpty($valueObj);
+
+        // DELETES
+        // Delete the account via it's id.
         $saasu->delete($valueObj->getId());
+        // Create an expected failure (Exception) for fetch a supposed missing record
         $badRequest = function () use ($saasu, $valueObj)
         {
             $saasu->fetchOne($valueObj->getId());
@@ -246,61 +277,58 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         // is the same as the original raw data checking
         // the the values don't damage the data
         $this->assertEquals(json_encode($rawData, JSON_PRETTY_PRINT), json_encode($valueObj, JSON_PRETTY_PRINT));
-        // @TODO: Fix this once line items have been created
-//        $testContactId      = $valueObj->BillingContactId;
-//         Create a new transport object
-//        $invoiceClient      = new Invoice($this->restClient);
-//         Now create a new invoice via http
-//        $valueObj           = $invoiceClient->create($valueObj);
+        $testContactId      = $valueObj->BillingContactId;
+        // Create a new transport object
+        $invoiceClient      = new Invoice($this->restClient);
+        //Now create a new invoice via http
+        $valueObj           = $invoiceClient->create($valueObj);
         // Get the id number from the newly created invoice
-//        $idNumber         = $valueObj->getId();
-//        // Check the id number exists
-//        $this->assertTrue(is_int($idNumber), 'Failed to create invoice detail');
-//        // Fetch the new object/record from saasu to make sure it was created correctly
-//        /** @var InvoiceTransactionDetail $valueObj */
-//        $valueObj         = $invoiceClient->fetchOne($valueObj->getId());
-//        // Make sure the ids are the same
-//        $this->assertEquals($idNumber, $valueObj->getId());
-//
-//        // UPDATE
-//        // Added test to the end of the name
-//        $newName        = $valueObj->Name . '-Test';
-//        $valueObj->Name = $newName;
-//        // Update the name on the server
-//        $valueObj       = $invoiceClient->update($valueObj);
-//        // Check the response id is the same as it was
-//        $this->assertEquals($idNumber, $valueObj->getId());
-//
-//
-//        // FETCH MANY
-//        // Add some filters for the search and fetch from the server
-//        $valueObjs = $invoiceClient->fetch([
-//            'IsBankInvoice'  => true,
-//            'IsActive'       => true,
-//            'IncludeBuiltIn' => false,
-//            'PageSize'       => 100
-//        ]);
-//        // Make sure there is an array of values
-//        $this->assertTrue(is_array($valueObjs));
-//        // Make sure that there is more than zero values
-//        $this->assertNotEmpty($valueObjs);
-//        // Fetch the value that has our new name
-//        $valueObj = $this->getObjectByName($valueObjs, $newName);
-//        // Make sure it was in the list from fetch()
-//        $this->assertNotEmpty($valueObj);
-//
-//
-//        // DELETES
-//        // Delete the invoice via it's id.
-//        $invoiceClient->delete($valueObj->getId());
-//        // Create an expected failure (Exception) for fetch a supposed missing record
-//        $badRequest = function () use ($invoiceClient, $valueObj)
-//        {
-//            $invoiceClient->fetchOne($valueObj->getId());
-//        };
-//        $this->assertException($badRequest);
-//
-//        $this->deleteTestContact($testContactId);
+        $idNumber         = $valueObj->getId();
+        // Check the id number exists
+        $this->assertTrue(is_int($idNumber), 'Failed to create invoice detail');
+        // Fetch the new object/record from saasu to make sure it was created correctly
+        /** @var InvoiceTransactionDetail $valueObj */
+        $valueObj         = $invoiceClient->fetchOne($valueObj->getId());
+        // Make sure the ids are the same
+        $this->assertEquals($idNumber, $valueObj->getId());
+
+        // UPDATE
+        // Added test to the end of the name
+        $newSummary                     = $valueObj->Summary . '-test';
+        $valueObj->Summary              = $newSummary;
+        // Update the name on the server
+        $valueObj           = $invoiceClient->update($valueObj);
+        // Check the response id is the same as it was
+        $this->assertEquals($idNumber, $valueObj->getId());
+
+
+        // FETCH MANY
+        // Add some filters for the search and fetch from the server
+        $valueObjs = $invoiceClient->fetch([
+            'InvoiceNumber'             => $valueObj->InvoiceNumber,
+            'TransactionType'           => 'S',
+        ]);
+        // Make sure there is an array of values
+        $this->assertTrue(is_array($valueObjs));
+        // Make sure that there is more than zero values
+        $this->assertNotEmpty($valueObjs);
+        // Fetch the value that has our new name
+        $valueObj = $this->getObjectByName($valueObjs, $newSummary, 'Summary');
+        // Make sure it was in the list from fetch()
+        $this->assertNotEmpty($valueObj);
+
+
+        // DELETES
+        // Delete the invoice via it's id.
+        $invoiceClient->delete($valueObj->getId());
+        // Create an expected failure (Exception) for fetch a supposed missing record
+        $badRequest = function () use ($invoiceClient, $valueObj)
+        {
+            $invoiceClient->fetchOne($valueObj->getId());
+        };
+        $this->assertException($badRequest);
+
+        $this->deleteTestContact($testContactId);
 
     }
 
@@ -383,17 +411,31 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 //        $response = $saasu->get($id);
 //    }
 //
-//    public function testTaxCode()
-//    {
-//        $data     = [];
-//        $saasu    = new TaxCode($this->restClient);
-//        $response = $saasu->create(null, $data);
-//        $response = $saasu->fetchOne($response->something);
-//        $response = $saasu->update($id, $data);
-//        $response = $saasu->get($filters);
-//        $response = $saasu->delete($id);
-//        $response = $saasu->get($id);
-//    }
+    public function testTaxCode()
+    {
+
+        // Fetch raw data for use in testing
+        $rawData  = $this->getTaxCodeTestData();
+        // Create a instance of AccountDetail (Bucket of data);
+        $valueObj = new TaxCodeDetail(deepClone($rawData));
+        // Check that the serialized (json_encoded) data
+        // is the same as the original raw data checking
+        // the the values don't damage the data
+        $this->assertEquals(json_encode($rawData), json_encode($valueObj));
+
+        $saasu     = new TaxCode($this->restClient);
+        $valueObjs = $saasu->fetch([
+            'isActive' => 'true',
+        ]);
+        $this->assertTrue(is_array($valueObjs));
+        $this->assertNotEmpty($valueObjs);
+        /** @var TaxCodeDetail $valueObj */
+        $valueObj = $valueObjs[0];
+        $idNumber = $valueObj->getId();
+        $valueObj = $saasu->fetchOne($idNumber);
+        $this->assertEquals($idNumber, $valueObj->getId());
+
+    }
 
     protected function getObjectByName(array $values, $nameToMatch, $field = 'Name')
     {
@@ -665,7 +707,8 @@ JSON;
     protected function getInvoiceTestData()
     {
         $contactId  = $this->createTestContact()->getId();
-        //$randomise  = microtime(true) . rand(5, 590000);
+        $itemId  = $this->createTestItem()->getId();
+        $randomise  = microtime(true) . rand(5, 590000);
         $data       = <<<JSON
 {
   "LineItems": [
@@ -678,7 +721,7 @@ JSON;
       "Quantity": 3.0,
       "UnitPrice": 11.5,
       "PercentageDiscount": 0.0,
-      "InventoryId": 30,
+      "InventoryId": {$itemId},
       "ItemCode": "CC123",
       "Tags": [],
       "Attributes": [],
@@ -715,10 +758,10 @@ JSON;
   "SendEmailToContact": null,
   "EmailMessage": null,
   "QuickPayment": null,
-  "TransactionId": 5093684,
+  "TransactionId": null,
   "LastUpdatedId": "AAAAAAAKgc=",
   "Currency": "AUD",
-  "InvoiceNumber": "INV-1123",
+  "InvoiceNumber": "INV-1123{$randomise}",
   "InvoiceType": "Tax Invoice",
   "TransactionType": "S",
   "Layout": "I",
@@ -737,7 +780,7 @@ JSON;
   "BillingContactFirstName": "Freddy",
   "BillingContactLastName": "Fungus",
   "BillingContactOrganisationName": "Fungal Innovation",
-  "ShippingContactId": 10,
+  "ShippingContactId": {$contactId},
   "ShippingContactFirstName": "Big",
   "ShippingContactLastName": "Bob",
   "ShippingContactOrganisationName": "Bobbby Inc",
@@ -849,6 +892,34 @@ JSON;
         return j($data);
     }
 
+
+    protected function getTaxCodeTestData()
+    {
+
+        $data = <<<JSON
+{
+  "Notes": "some notes",
+  "Id": 1,
+  "Code": "G1",
+  "Name": "Sale Inc GST",
+  "Rate": 0.1,
+  "PostingAccountId": 123,
+  "IsSale": true,
+  "IsPurchase": false,
+  "IsPayroll": true,
+  "IsInbuilt": false,
+  "IsShared": true,
+  "IsActive": true,
+  "CreatedDateUtc": "2015-07-06T21:24:01.890",
+  "LastModifiedDateUtc": "2016-07-05T21:24:01.890",
+  "LastModifiedByUserId": 123,
+  "LastUpdatedId": "AAAAAAkh==",
+  "_links": []
+}
+JSON;
+        return j($data);
+    }
+
     /**
      * @param bool $isSupplier
      * @param bool $isCustomer
@@ -861,6 +932,20 @@ JSON;
         $valueObj = new ContactAggregateDetail(deepClone($rawData));
         $this->assertEquals(json_encode($rawData), json_encode($valueObj));
         $saasu    = new ContactAggregate($this->restClient);
+        return $saasu->create($valueObj);
+
+    }
+
+    /**
+     * @return \Terah\Saasu\Values\RestableValue
+     */
+    protected function createTestItem()
+    {
+
+        $rawData = $this->getItemTestData();
+        $valueObj = new ItemDetail(deepClone($rawData));
+        $this->assertEquals(json_encode($rawData), json_encode($valueObj));
+        $saasu    = new Item($this->restClient);
         return $saasu->create($valueObj);
 
     }
@@ -908,4 +993,4 @@ function deepClone($obj)
 }
 
 // cd /Users/jamesnoon/Projects/Saasu/vendor/terah/saasu-rest-api-client/tests
-// phpunit --filter=testAccounts SaasuTest.php
+// phpunit --filter=testAccount SaasuTest.php

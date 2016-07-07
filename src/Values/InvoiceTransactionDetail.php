@@ -334,10 +334,10 @@ class InvoiceTransactionDetail extends RestableValue
      */
     public function set(\stdClass $data)
     {
-        if ( isset($data->InsertId) )
+        if ( isset($data->InsertedEntityId) )
         {
-            $this->TransactionId = $data->InsertId;
-            unset($data->InsertId);
+            $this->TransactionId = $data->InsertedEntityId;
+            unset($data->InsertedEntityId);
         }
         if ( isset($data->LineItems) && is_array($data->LineItems) )
         {
@@ -369,6 +369,11 @@ class InvoiceTransactionDetail extends RestableValue
         {
             $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
             unset($data->LastModifiedDateUtc);
+        }
+        if ( isset($data->DueDate) )
+        {
+            $this->DueDate = new DateTime($data->DueDate);
+            unset($data->DueDate);
         }
         if ( isset($data->Tags ) )
         {

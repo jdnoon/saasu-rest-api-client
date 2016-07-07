@@ -2,54 +2,44 @@
 
 namespace Terah\Saasu;
 
+use Terah\Saasu\Values\TaxCodeDetail;
+
+use function Terah\Assert\Assert;
+
 /**
  * Class TaxCode
  *
  * @package Terah\Saasu
- *
- * @property string Notes
- * @property integer Id
- * @property string Code
- * @property string Name
- * @property double Rate
- * @property integer PostingAccountId
- * @property boolean IsSale
- * @property boolean IsPurchase
- * @property boolean IsPayroll
- * @property boolean IsInbuilt
- * @property boolean IsShared
- * @property boolean IsActive
- * @property string CreatedDateUtc
- * @property string LastModifiedDateUtc
- * @property integer LastModifiedByUserId
- * @property string LastUpdatedId
- * @property array _links
  */
 class TaxCode extends Entity
 {
-    protected $entities = [
-        'singular' => 'TaxCode',
-        'plural'   => 'TaxCodes'
+    use EntityFetchOneTrait;
+    use EntityFetchTrait;
+
+    protected $singularAttribute    = 'TaxCode';
+    protected $pluralAttribute      = 'TaxCodes';
+
+    /**
+     * @var array
+     */
+    protected $filters           = [
+        //	Specifies the page number of the result set to return. integer
+        'Page'                      => null,
+        // Specifies the number of records on each page of results. Maximum page size is 100. Defaults to 25 if not specified. integer
+        'PageSize'                  => null,
+        // Filter records that are either Active (IsActive=true) or Inactive (IsActive=false). boolean
+        'isActive'                  => null,
+
     ];
 
-    protected $fields = [
-        'Notes'                => '',
-        'Id'                   => null,
-        'Code'                 => '',
-        'Name'                 => '',
-        'Rate'                 => null,
-        'PostingAccountId'     => null,
-        'IsSale'               => true,
-        'IsPurchase'           => false,
-        'IsPayroll'            => true,
-        'IsInbuilt'            => false,
-        'IsShared'             => true,
-        'IsActive'             => true,
-        'CreatedDateUtc'       => '',
-        'LastModifiedDateUtc'  => '',
-        'LastModifiedByUserId' => null,
-        'LastUpdatedId'        => '',
-        '_links'               => [],
-    ];
-
+    /**
+     * @param \stdClass $data
+     * @return TaxCodeDetail
+     */
+    protected function getValueObject(\stdClass $data)
+    {
+        return new TaxCodeDetail($data);
+    }
 }
+
+
