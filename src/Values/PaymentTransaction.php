@@ -8,6 +8,10 @@ namespace Terah\Saasu\Values;
  *
  * @package Terah\Saasu\Values
  */
+/**
+ * Class PaymentTransaction
+ * @package Terah\Saasu\Values
+ */
 class PaymentTransaction extends RestableValue
 {
 
@@ -26,7 +30,7 @@ class PaymentTransaction extends RestableValue
 
     /**
      * The Id of the transaction.
-     * @var null
+     * @var int
      */
     public $TransactionId                    =  null;
 
@@ -42,7 +46,7 @@ class PaymentTransaction extends RestableValue
      * @required
      * @var string
      */
-    public $TransactionType                  =  '';
+    public $TransactionType                  =  null;
 
     /**
      * Bank Account ID used to receive or pay funds.
@@ -133,4 +137,65 @@ class PaymentTransaction extends RestableValue
      * @var array
      */
     public $_links                           =  [];
+
+    /**
+     * @return null
+     */
+    public function getId()
+    {
+        return $this->TransactionId;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setId($value)
+    {
+        $this->TransactionId = $value;
+        return $this;
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return $this
+     */
+    public function set(\stdClass $data)
+    {
+        if ( isset($data->InsertedEntityId) )
+        {
+            $this->TransactionId = $data->InsertedEntityId;
+            unset($data->InsertedEntityId);
+        }
+        if ( isset($data->CreatedDateUtc) )
+        {
+            $this->CreatedDateUtc = new DateTime($data->CreatedDateUtc);
+            unset($data->CreatedDateUtc);
+        }
+        if ( isset($data->LastModifiedDateUtc) )
+        {
+            $this->LastModifiedDateUtc = new DateTime($data->LastModifiedDateUtc);
+            unset($data->LastModifiedDateUtc);
+        }
+        if ( isset($data->ClearedDate) )
+        {
+            $this->ClearedDate = new DateTime($data->ClearedDate);
+            unset($data->ClearedDate);
+        }
+        if ( isset($data->TransactionDate) )
+        {
+            $this->TransactionDate = new DateTime($data->TransactionDate);
+            unset($data->TransactionDate);
+        }
+        if ( isset($data->PaymentItems) && is_array($data->PaymentItems) )
+        {
+            foreach ( $data->PaymentItems as $paymentItem )
+            {
+                $this->PaymentItems[] = new PaymentItem($paymentItem);
+            }
+            unset($data->PaymentItems);
+        }
+        return parent::set($data);
+    }
+
 }

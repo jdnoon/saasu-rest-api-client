@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../../vendor/autoload.php';
 
 use Terah\Saasu\Invoice;
 use Terah\Saasu\Item;
+use Terah\Saasu\Payment;
 use Terah\Saasu\RestClient;
 use Terah\Saasu\Account;
 use Terah\Saasu\TaxCode;
@@ -19,19 +20,35 @@ use Terah\Saasu\Values\CompanyDetail;
 use Terah\Saasu\ContactAggregate;
 use Terah\Saasu\Values\DateTime;
 use Terah\Saasu\Values\FileIdentityDetail;
+use Terah\Saasu\Values\InvoiceQuickPaymentDetail;
 use Terah\Saasu\Values\InvoiceTransactionDetail;
 use Terah\Saasu\Values\ItemDetail;
+use Terah\Saasu\Values\PaymentItem;
+use Terah\Saasu\Values\PaymentTransaction;
 use Terah\Saasu\Values\TaxCodeDetail;
 
+/**
+ * Class SaasuTest
+ * @package Terah\Saasu\Test
+ */
 class SaasuTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var null
+     */
     public $restClient = null;
 
+    /**
+     *
+     */
     public function setUp()
     {
         $this->restClient = new RestClient('https://api.saasu.com/', getenv('SAASU_TOKEN'), getenv('SAASU_FILE_ID'));
     }
 
+    /**
+     *
+     */
     public function testAccount()
     {
         // CREATION
@@ -130,6 +147,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 //        $this->assertException($badRequest);
 //    }
 
+    /**
+     *
+     */
     public function testCompany()
     {
         // CREATE
@@ -192,6 +212,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertException($badRequest);
     }
 
+    /**
+     *
+     */
     public function testContact()
     {
         $companyData = $this->getCompanyTestData();
@@ -231,6 +254,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertException($badRequest);
     }
 
+    /**
+     *
+     */
     public function testContactAggregate()
     {
         $rawData  = $this->getContactAggregateTestData();
@@ -252,6 +278,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newName, $valueObj->FamilyName);
     }
 
+    /**
+     *
+     */
     public function testFileIdentity()
     {
         $saasu     = new FileIdentity($this->restClient);
@@ -265,6 +294,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($companyName, $valueObj->Name);
     }
 
+    /**
+     *
+     */
     public function testInvoice()
     {
         // CREATION
@@ -332,6 +364,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     *
+     */
     public function testItem()
     {
         // CREATION
@@ -399,18 +434,40 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->assertException($badRequest);
     }
 
-//    public function testPayment()
-//    {
-//        $data     = [];
-//        $saasu    = new Payment($this->restClient);
-//        $response = $saasu->create(null, $data);
-//        $response = $saasu->fetchOne($response->something);
-//        $response = $saasu->update($id, $data);
-//        $response = $saasu->get($filters);
-//        $response = $saasu->delete($id);
-//        $response = $saasu->get($id);
-//    }
-//
+    /**
+     *
+     */
+    public function testPayment()
+    {
+
+        // Fetch raw data for use in testing
+        $rawData            = $this->getPaymentTestData();
+        // Create a instance of PaymentTransaction (Bucket of data);
+        $valueObj           = new PaymentTransaction(deepClone($rawData));
+        // Check that the serialized (json_encoded) data
+        // is the same as the original raw data checking
+        // the the values don't damage the data
+        $this->assertEquals(json_encode($rawData, JSON_PRETTY_PRINT), json_encode($valueObj, JSON_PRETTY_PRINT));
+        $testContactId      = $valueObj->TransactionId;
+        // Create a new transport object
+        $paymentClient      = new Payment($this->restClient);
+        // Now create a new invoice via http
+        $valueObj           = $paymentClient->create($valueObj);
+        // Get the id number from the newly created invoice
+//        $idNumber         = $valueObj->getId();
+//        // Check the id number exists
+//        $this->assertTrue(is_int($idNumber), 'Failed to create invoice detail');
+//        // Fetch the new object/record from saasu to make sure it was created correctly
+//        /** @var InvoiceTransactionDetail $valueObj */
+//        $valueObj         = $invoiceClient->fetchOne($valueObj->getId());
+//        // Make sure the ids are the same
+//        $this->assertEquals($idNumber, $valueObj->getId());
+
+    }
+
+    /**
+     *
+     */
     public function testTaxCode()
     {
 
@@ -437,6 +494,12 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * @param array $values
+     * @param $nameToMatch
+     * @param string $field
+     * @return bool|mixed
+     */
     protected function getObjectByName(array $values, $nameToMatch, $field = 'Name')
     {
         foreach ( $values as $value )
@@ -449,6 +512,12 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         return false;
     }
 
+    /**
+     * @param callable $callback
+     * @param string $expectedException
+     * @param null $expectedCode
+     * @param null $expectedMessage
+     */
     protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = null, $expectedMessage = null)
     {
         if ( ! class_exists($expectedException) && ! interface_exists($expectedException) )
@@ -484,6 +553,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
         $this->fail("Failed asserting that exception$extraInfo was thrown.");
     }
 
+    /**
+     * @return mixed
+     */
     protected function getAccountTestData()
     {
         $randomise = microtime(true) . rand(5, 590000);
@@ -516,6 +588,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 }');
     }
 
+    /**
+     * @return mixed
+     */
     protected function createTestItemAccountData()
     {
         //$randomise = microtime(true) . rand(5, 590000);
@@ -543,6 +618,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 }');
     }
 
+    /**
+     * @return mixed
+     */
     protected function getCompanyTestData()
     {
         $randomise = microtime(true) . rand(5, 590000);
@@ -563,6 +641,9 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 }');
     }
 
+    /**
+     * @return mixed
+     */
     protected function getContactTestData()
     {
         $randomise = microtime(true) . rand(5, 590000);
@@ -646,6 +727,11 @@ class SaasuTest extends \PHPUnit_Framework_TestCase
 }');
     }
 
+    /**
+     * @param bool $isSupplier
+     * @param bool $isCustomer
+     * @return mixed
+     */
     protected function getContactAggregateTestData($isSupplier=false, $isCustomer=true)
     {
         $randomise      = microtime(true) . rand(5, 590000);
@@ -704,6 +790,9 @@ JSON;
     }
 
 
+    /**
+     * @return mixed
+     */
     protected function getInvoiceTestData()
     {
         $contactId  = $this->createTestContact()->getId();
@@ -801,10 +890,48 @@ JSON;
     }
 
 
+    /**
+     * @return mixed
+     */
+    protected function getPaymentTestData()
+    {
+        $randomise              = microtime(true) . rand(5, 590000);
+        $paymentAccountId       = $this->createTestAccount('Income - ' . $randomise, 'Income', 41000)->getId();
+
+        $data                   = <<<JSON
+{
+  "Notes": "payment notes",
+  "PaymentItems": [],
+  "TransactionId": 0,
+  "TransactionDate": "2016-07-07T14:00:00.000",
+  "TransactionType": null,
+  "PaymentAccountId": {$paymentAccountId},
+  "TotalAmount": 10.0,
+  "FeeAmount": 0.0,
+  "Summary": "Payment for invoice 1",
+  "Reference": "Toy inv",
+  "ClearedDate": "2016-07-08T00:00:00.000",
+  "Currency": "AUD",
+  "AutoPopulateFxRate": false,
+  "FxRate": 0.0,
+  "CreatedDateUtc": "2016-07-07T22:00:09.601",
+  "LastModifiedDateUtc": "2016-07-07T22:00:09.601",
+  "LastUpdatedId": null,
+  "RequiresFollowUp": false,
+  "_links": []
+}
+JSON;
+        return j($data);
+    }
+
+
+    /**
+     * @return mixed
+     */
     protected function getItemTestData()
     {
         //$contactId  = $this->createTestContact()->getId();
-        $randomise  = microtime(true) . rand(5, 590000);
+        $randomise                  = microtime(true) . rand(5, 590000);
 
         //$cos                        = (new Account($this->restClient))->fetchOne(2583357);
         $AssetAccountId             = $this->createTestAccount('Inventory - ' . $randomise, 'Asset', 11002)->getId();
@@ -893,6 +1020,9 @@ JSON;
     }
 
 
+    /**
+     * @return mixed
+     */
     protected function getTaxCodeTestData()
     {
 
@@ -973,6 +1103,10 @@ JSON;
 
     }
 
+    /**
+     * @param $id
+     * @return null|\stdClass|string
+     */
     protected function deleteTestContact($id)
     {
         $saasu    = new Contact($this->restClient);
@@ -982,11 +1116,19 @@ JSON;
 
 }
 
+/**
+ * @param $json
+ * @return mixed
+ */
 function j($json)
 {
     return json_decode($json, false);
 }
 
+/**
+ * @param $obj
+ * @return mixed
+ */
 function deepClone($obj)
 {
     return json_decode(json_encode($obj));
