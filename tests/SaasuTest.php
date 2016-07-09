@@ -898,11 +898,23 @@ JSON;
         $randomise              = microtime(true) . rand(5, 590000);
         $paymentAccountId       = $this->createTestAccount('Income - ' . $randomise, 'Income', 41000)->getId();
 
+        $invoiceIdOne           = $this->createTestInvoice()->getId();
+        $invoiceIdTwo           = $this->createTestInvoice()->getId();
+
         $data                   = <<<JSON
 {
   "Notes": "payment notes",
-  "PaymentItems": [],
-  "TransactionId": 0,
+  "PaymentItems": [
+    {
+      "InvoiceTransactionId": {$invoiceIdOne},
+      "AmountPaid": 120.0
+    },
+    {
+      "InvoiceTransactionId": {$invoiceIdTwo},
+      "AmountPaid": 150.0
+    }
+  ],
+  "TransactionId": 324,
   "TransactionDate": "2016-07-07T14:00:00.000",
   "TransactionType": null,
   "PaymentAccountId": {$paymentAccountId},
@@ -1100,6 +1112,31 @@ JSON;
         $accountClient              = new Account($this->restClient);
         // Now create a new invoice via http
         return $accountClient->create($valueObj);
+
+    }
+
+    /**
+     * @param String $name
+     * @param String $accountType
+     * @param String $ledgerCode
+     * @return \Terah\Saasu\Values\RestableValue
+     */
+    protected function createTestInvoice() //$name, $accountType, $ledgerCode)
+    {
+
+        $rawData            = $this->getInvoiceTestData();
+        // Create a instance of InvoiceDetail (Bucket of data);
+        $valueObj           = new InvoiceTransactionDetail(deepClone($rawData));
+        // Check that the serialized (json_encoded) data
+        // is the same as the original raw data checking
+        // the the values don't damage the data
+        $this->assertEquals(json_encode($rawData, JSON_PRETTY_PRINT), json_encode($valueObj, JSON_PRETTY_PRINT));
+        $testContactId      = $valueObj->BillingContactId;
+        // Create a new transport object
+        $invoiceClient      = new Invoice($this->restClient);
+        //Now create a new invoice via http
+        return $invoiceClient->create($valueObj);
+
 
     }
 

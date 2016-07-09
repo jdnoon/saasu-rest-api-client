@@ -11,6 +11,6 @@ trait EntityDeleteTrait
      */
     public function delete($id)
     {
-        return $this->restClient->method(Client::DELETE)->sendRequest($this->getSingular($id));
+        return $this->restClient->method(Client::DELETE)->sendRequest(strtolower($this->getSingular($id)));
     }
 }

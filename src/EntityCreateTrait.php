@@ -19,7 +19,7 @@ trait EntityCreateTrait
         }
         $restClient = $this->restClient;
         /** @var RestClient $restClient */
-        $data = $restClient->method(Client::INSERT)->setValue($value)->sendRequest($this->getSingular());
+        $data = $restClient->method(Client::INSERT)->setValue($value)->sendRequest(strtolower($this->getSingular()));
         return $value->set($data);
     }
 }
